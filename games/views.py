@@ -17,7 +17,6 @@ redirect_uri = 'http://localhost:8000/auth/'
 authorization_endpoint = 'https://talent.kruzhok.org/oauth/authorize/'
 token_endpoint = 'https://talent.kruzhok.org/api/oauth/issue-token/'
 
-talant_oauth_client = OAuth2Session(client_id, client_secret, token_endpoint_auth_method='client_secret_post')
 
 
 def index_page(request):
@@ -34,22 +33,24 @@ def user_page(request):
 
 
 def login_page(request):
-    uri, state = talant_oauth_client.create_authorization_url(authorization_endpoint, redirect_uri=redirect_uri)
+    talent_oauth_client = OAuth2Session(client_id, client_secret, token_endpoint_auth_method='client_secret_post')
+    uri, state = talent_oauth_client.create_authorization_url(authorization_endpoint, redirect_uri=redirect_uri)
     return render(request, 'login.html', {'url': uri})
 
 
 def auth_page(request):
-    token = talant_oauth_client.fetch_token(
+    talent_oauth_client = OAuth2Session(client_id, client_secret, token_endpoint_auth_method='client_secret_post')
+    token = talent_oauth_client.fetch_token(
         token_endpoint,
         authorization_response=f'{request.GET["code"]}',
         redirect_uri=redirect_uri
     )
-    user_info = get_talant_info(token)
+    user_info = get_talent_info(token)
     if not User.objects.filter(email=user_info.email).exists():
         register_user(user_info, token)
 
     user = authenticate(request, email=user_info.email)
-    print(user)
+
     if user is not None:
         login(request, user)
         return redirect('user_page')
@@ -58,25 +59,25 @@ def auth_page(request):
 
 
 @dataclass
-class TalantInfo:
+class TalentInfo:
     id: int
     email: str
     first_name: str
     last_name: str
 
 
-def register_user(talant_info: TalantInfo, token):
-    user = User(email=talant_info.email, first_name=talant_info.first_name, last_name=talant_info.last_name)
+def register_user(talent_info: TalentInfo, token):
+    user = User(email=talent_info.email, first_name=talent_info.first_name, last_name=talent_info.last_name)
     user.save()
-    talant_user = TalantUser(user=user, access_token=json.dumps(token))
-    talant_user.save()
+    talent_user = TalantUser(user=user, access_token=json.dumps(token))
+    talent_user.save()
 
 
-def get_talant_info(token) -> TalantInfo:
+def get_talent_info(token) -> TalentInfo:
     client = OAuth2Session(client_id, client_secret, token=token)
     # id, email, first_name, last_name
     resp = client.get('https://talent.kruzhok.org/api/user/').json()
-    return TalantInfo(id=resp['id'], email=resp['email'], first_name=resp['first_name'], last_name=resp['last_name'])
+    return TalentInfo(id=resp['id'], email=resp['email'], first_name=resp['first_name'], last_name=resp['last_name'])
 
 
 @login_required
