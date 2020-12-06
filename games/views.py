@@ -1,22 +1,13 @@
-from dataclasses import dataclass
 import json
 
 from django.contrib.auth.decorators import login_required
-from django.conf import settings
 from django.shortcuts import render, redirect
-from authlib.integrations.requests_client import OAuth2Session
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout, login
 from django.urls import reverse
 
 from .models import TalantUser
-
-client_id = settings.TALANT_CLIENT_ID
-client_secret = settings.TALANT_CLIENT_SECRET
-redirect_uri = 'http://localhost:8000/auth/'
-authorization_endpoint = 'https://talent.kruzhok.org/oauth/authorize/'
-token_endpoint = 'https://talent.kruzhok.org/api/oauth/issue-token/'
-
+from . import talent
 
 
 def index_page(request):
@@ -33,19 +24,20 @@ def user_page(request):
 
 
 def login_page(request):
-    talent_oauth_client = OAuth2Session(client_id, client_secret, token_endpoint_auth_method='client_secret_post')
-    uri, state = talent_oauth_client.create_authorization_url(authorization_endpoint, redirect_uri=redirect_uri)
+    talent_oauth_client = talent.get_oauth_sess()
+    redirect_uri = request.build_absolute_uri(reverse('auth'))
+    uri, state = talent_oauth_client.create_authorization_url(talent.authorization_endpoint, redirect_uri=redirect_uri)
     return render(request, 'login.html', {'url': uri})
 
 
 def auth_page(request):
-    talent_oauth_client = OAuth2Session(client_id, client_secret, token_endpoint_auth_method='client_secret_post')
+    talent_oauth_client = talent.get_oauth_sess()
     token = talent_oauth_client.fetch_token(
-        token_endpoint,
-        authorization_response=f'{request.GET["code"]}',
-        redirect_uri=redirect_uri
+        talent.token_endpoint,
+        authorization_response=request.GET["code"],
+        redirect_uri=request.build_absolute_uri(reverse('auth')),
     )
-    user_info = get_talent_info(token)
+    user_info = talent.get_talent_info(token)
     if not User.objects.filter(email=user_info.email).exists():
         register_user(user_info, token)
 
@@ -58,26 +50,11 @@ def auth_page(request):
     return redirect('index')
 
 
-@dataclass
-class TalentInfo:
-    id: int
-    email: str
-    first_name: str
-    last_name: str
-
-
-def register_user(talent_info: TalentInfo, token):
+def register_user(talent_info: talent.TalentInfo, token):
     user = User(email=talent_info.email, first_name=talent_info.first_name, last_name=talent_info.last_name)
     user.save()
     talent_user = TalantUser(user=user, access_token=json.dumps(token))
     talent_user.save()
-
-
-def get_talent_info(token) -> TalentInfo:
-    client = OAuth2Session(client_id, client_secret, token=token)
-    # id, email, first_name, last_name
-    resp = client.get('https://talent.kruzhok.org/api/user/').json()
-    return TalentInfo(id=resp['id'], email=resp['email'], first_name=resp['first_name'], last_name=resp['last_name'])
 
 
 @login_required
