@@ -14,10 +14,7 @@ from . import talent
 
 
 def index_page(request):
-    if request.user.is_authenticated:
-        return redirect('login')
-    else:
-        return render(request, 'index.html')
+    return render(request, 'index.html')
 
 
 @login_required
@@ -72,7 +69,7 @@ def steam_login(request):
         'openid.realm': request.build_absolute_uri(reverse('index')),
     }
 
-    auth_url = settings.FORMAT_STEAM_AUTH_URL(urlencode(params))
+    auth_url = settings.FORMAT_STEAM_AUTH_URL.format(urlencode(params))
     return redirect(auth_url)
 
 
