@@ -1,7 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<p>{{ user.first_name }}</p>
-<p>{{ user.last_name }}</p>
-<p>{{ user.email }}</p>
+    <p>{{ user.first_name }}</p>
+    <p>{{ user.last_name }}</p>
+    <p>{{ user.email }}</p>
+
+    <div>
+        <p>Steam: </p>
+        {% if user.talantuser.steam_id != 0 %}
+            <p>{{ user.talantuser.steam_id }}</p><a href="{% url 'steam_logout' %}">Отвязать</a>
+        {% else %}
+            <a href="{% url 'steam_login' %}">Привязать</a>
+        {% endif %}
+    </div>
 {% endblock %}

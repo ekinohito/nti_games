@@ -7,4 +7,7 @@ urlpatterns = [
     path('auth/', views.auth_page, name='auth'),
     path('logout/', views.logout_page, name='logout'),
     path('user/', views.user_page, name='user_page'),
+    path('steam/login', views.steam_login, name='steam_login'),
+    path('steam/auth', views.steam_auth, name='steam_auth'),
+    path('steam/logout', views.steam_logout, name='steam_logout')
 ]

@@ -61,6 +61,11 @@ LOGIN_URL = '/login/'
 TALANT_CLIENT_ID = os.getenv("TALANT_CLIENT_ID")
 TALANT_CLIENT_SECRET = os.getenv("TALANT_CLIENT_SECRET")
 
+OPEN_ID_NS = 'http://specs.openid.net/auth/2.0'
+OPEN_ID_CLAIMED_ID = 'http://specs.openid.net/auth/2.0/identifier_select'
+OPEN_ID_IDENTITY = 'http://specs.openid.net/auth/2.0/identifier_select'
+FORMAT_STEAM_AUTH_URL = 'https://steamcommunity.com/openid/login?{}'
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
