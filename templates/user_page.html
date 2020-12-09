@@ -1,16 +1,16 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <p>{{ user.first_name }}</p>
-    <p>{{ user.last_name }}</p>
-    <p>{{ user.email }}</p>
+    <h1>Страница пользователя</h1>
+    <p>Пользователь: {{ user.first_name }} {{ user.last_name }}</p>
+    <p>Почта: {{ user.email }}</p>
 
     <div>
-        <p>Steam: </p>
+        <h2>Steam:</h2>
         {% if user.talantuser.steam_id != 0 %}
-            <p>{{ user.talantuser.steam_id }}</p><a href="{% url 'steam_logout' %}">Отвязать</a>
+            <p>{{ user.talantuser.steam_id }}</p><a class="btn btn-outline-primary" href="{% url 'steam_logout' %}" role="button">Отвязать</a>
         {% else %}
-            <a href="{% url 'steam_login' %}">Привязать</a>
+            <a class="btn btn-primary" href="{% url 'steam_login' %}" role="button">Привязать</a>
         {% endif %}
     </div>
 {% endblock %}
