@@ -1,2 +1,4 @@
 django
 authlib
+python-dotenv
+requests
