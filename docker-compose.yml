@@ -3,11 +3,9 @@ version: '3.7'
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8800
-    volumes:
-      - .:/var/www/nti
-    ports:
-      - "8800:8800"
+    command: gunicorn nti_games.wsgi:application --bind 0.0.0.0:8800 -w 2
+    expose:
+      - 8800
     env_file:
       - ./.env
     depends_on:
@@ -16,9 +14,13 @@ services:
     image: postgres:12.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
-    environment:
-      - POSTGRES_USER=nti_games
-      - POSTGRES_PASSWORD=nti_games_pass
-      - POSTGRES_DB=nti_games_test
+    env_file:
+      - ./.env
+  nginx:
+    build: ./nginx
+    ports:
+      - 1337:80
+    depends_on:
+      - web
 volumes:
   postgres_data:
