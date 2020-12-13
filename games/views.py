@@ -8,6 +8,8 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout, login
 from django.urls import reverse
 from django.conf import settings
+import requests
+import time
 
 from .models import TalantUser
 from . import talent
@@ -19,24 +21,41 @@ def index_page(request):
 
 @login_required
 def user_page(request):
-    user = User.objects.get(email=request.user.email)
-    return render(request, 'user_page.html', {'user': user})
+    return render(request, 'user_page.html', {'user': request.user})
 
 
 def login_page(request):
-    talent_oauth_client = talent.get_oauth_sess()
     redirect_uri = request.build_absolute_uri(reverse('auth'))
-    uri, state = talent_oauth_client.create_authorization_url(talent.authorization_endpoint, redirect_uri=redirect_uri)
+    uri, state = talent.get_oauth_sess().create_authorization_url(
+        talent.authorization_endpoint, response_type='code',
+        nonce=time.time(), redirect_uri=redirect_uri
+    )
     return render(request, 'login.html', {'url': uri})
 
 
 def auth_page(request):
-    talent_oauth_client = talent.get_oauth_sess()
-    token = talent_oauth_client.fetch_token(
-        talent.token_endpoint,
-        authorization_response=request.GET["code"],
-        redirect_uri=request.build_absolute_uri(reverse('auth')),
-    )
+    # TODO: Add support of denying
+    #  GET '/auth/?error=access_denied&error_description=The+resource+owner+or+authorization+server+denied+the+request'
+
+    token = requests.post(talent.token_endpoint, data={
+        'grant_type': 'authorization_code',
+        'scope': 'openid',
+        'nonce': time.time(),
+        'client_id': talent.client_id,
+        'client_secret': talent.client_secret,
+        'redirect_uri': request.build_absolute_uri(reverse('auth')),
+        'code': request.GET['code'],
+    }).json()
+
+    # token = talent.get_oauth_sess().fetch_access_token(
+    #     talent.token_endpoint,
+    #     grant_type='authorization_code',
+    #     scope='openid',
+    #     nonce=time.time(),
+    #     redirect_uri=request.build_absolute_uri(reverse('auth')),
+    #     code=request.GET['code'],
+    # )
+
     user_info = talent.get_talent_info(token)
     if not User.objects.filter(email=user_info.email).exists():
         register_user(user_info, token)
@@ -51,7 +70,7 @@ def auth_page(request):
 
 
 def register_user(talent_info: talent.TalentInfo, token):
-    user = User(email=talent_info.email, first_name=talent_info.first_name, last_name=talent_info.last_name)
+    user = User(email=talent_info.email, username=talent_info.email, first_name=talent_info.first_name, last_name=talent_info.last_name)
     user.save()
     talent_user = TalantUser(user=user, access_token=json.dumps(token))
     talent_user.save()

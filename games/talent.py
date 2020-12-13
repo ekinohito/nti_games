@@ -5,7 +5,6 @@ from authlib.integrations.requests_client import OAuth2Session
 
 client_id = settings.TALANT_CLIENT_ID
 client_secret = settings.TALANT_CLIENT_SECRET
-redirect_uri = 'http://localhost:8000/auth/'
 authorization_endpoint = 'https://talent.kruzhok.org/oauth/authorize/'
 token_endpoint = 'https://talent.kruzhok.org/api/oauth/issue-token/'
 
@@ -18,8 +17,8 @@ class TalentInfo:
     last_name: str
 
 
-def get_oauth_sess(token=None, token_endpoint_auth_method='client_secret_post'):
-    return OAuth2Session(client_id, client_secret, token=token, token_endpoint_auth_method=token_endpoint_auth_method)
+def get_oauth_sess():
+    return OAuth2Session(client_id, client_secret)
 
 
 def get_talent_info(token) -> TalentInfo:
