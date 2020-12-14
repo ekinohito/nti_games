@@ -7,7 +7,7 @@
 
     <div>
         <h2>Steam:</h2>
-        {% if user.talantuser.steam_id != 0 %}
+        {% if user.talantuser.steam_id %}
             <p>{{ user.talantuser.steam_id }}</p><a class="btn btn-outline-primary" href="{% url 'steam_logout' %}" role="button">Отвязать</a>
         {% else %}
             <a class="btn btn-primary" href="{% url 'steam_login' %}" role="button">Привязать</a>

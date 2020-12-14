@@ -25,6 +25,9 @@
                 <li class="nav-item">
                     <a class="nav-link" href="{% url 'user_page' %}">Пользователь</a>
                 </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="{% url 'analyse' %}">Анализ</a>
+                </li>
             </ul>
 
             <ul class="navbar-nav flex-row flex-wrap ms-md-auto">
@@ -36,13 +39,12 @@
                     {% endif %}
                 </li>
             </ul>
-
-{#            <a class="btn btn-bd-download d-lg-inline-block my-2 my-md-0 ms-md-3" href="{% url 'logout' %}">Download</a>#}
         </div>
     </div>
 </nav>
 
 
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js"></script>
 <div class="container">
     <div class="row justify-content-center">
         <div class="col-8">

@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h1>Страница для анализа</h1>
+
+    <div>
+        <h2>Dota:</h2>
+        {% if user.talantuser.dota_result %}
+            <p>Твой score: {{ user.talantuser.dota_result }}</p>
+            {#<a class="btn btn-outline-primary" href="{% url 'steam_logout' %}" role="button">Отвязать</a>#}
+        {% else %}
+            <p>Не проанализировано</p>
+            {#<a class="btn btn-primary" href="{% url 'steam_login' %}" role="button">Привязать</a>#}
+        {% endif %}
+
+        {% if user.talantuser.dota_process %}
+            <p>В процессе обработки</p>
+        {% else %}
+            <input type="button" id="dota_process" class="btn btn-primary" name="{{ company_slug }}" value="Начать анализ"/>
+
+            <script>
+                $('#dota_process').click(function () {
+                    $.ajax({
+                        type: "POST",
+                        url: "{% url 'analyse-dota' %}",
+                        data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                        dataType: "json",
+                        success: function (response) {
+                            {#alert(response.message);#}
+                            {#alert('Company likes count is now ' + response.likes_count);#}
+                        },
+                        error: function (rs, e) {
+                            {#alert(rs.responseText);#}
+                        }
+                    });
+                })
+            </script>
+
+        {% endif %}
+    </div>
+{% endblock %}

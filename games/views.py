@@ -13,6 +13,7 @@ import time
 
 from .models import TalantUser
 from . import talent
+from . import tasks
 
 
 def index_page(request):
@@ -70,7 +71,8 @@ def auth_page(request):
 
 
 def register_user(talent_info: talent.TalentInfo, token):
-    user = User(email=talent_info.email, username=talent_info.email, first_name=talent_info.first_name, last_name=talent_info.last_name)
+    user = User(email=talent_info.email, username=talent_info.email, first_name=talent_info.first_name,
+                last_name=talent_info.last_name)
     user.save()
     talent_user = TalantUser(user=user, access_token=json.dumps(token))
     talent_user.save()
@@ -114,7 +116,7 @@ def steam_auth(request):
 @login_required
 def steam_logout(request):
     request.user.talantuser.steam_openid = ''
-    request.user.talantuser.steam_id = 0
+    request.user.talantuser.steam_id = None
     request.user.talantuser.save()
 
     return redirect('user_page')
@@ -124,3 +126,29 @@ def steam_logout(request):
 def logout_page(request):
     logout(request)
     return redirect('index')
+
+
+@login_required
+def analyse_page(request):
+    return render(request, 'analyse.html', {'user': request.user})
+
+
+@login_required
+def dota_analyse(request):
+    if request.method == 'POST':
+        user = request.user
+        # slug = request.POST.get('slug', None)
+        # company = get_object_or_404(Company, slug=slug)
+
+        if user.talantuser.dota_process or user.talantuser.steam_id is None:
+            return
+
+        user.talantuser.dota_process = 1
+        user.talantuser.save()
+
+        tasks.dota_count.delay(user.pk)
+
+
+    # ctx = {'likes_count': company.total_likes, 'message': message}
+    # use mimetype instead of content_type if django < 5
+    return HttpResponse(json.dumps({}), content_type='application/json')
