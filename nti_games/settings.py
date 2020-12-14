@@ -61,8 +61,13 @@ OPEN_ID_CLAIMED_ID = 'http://specs.openid.net/auth/2.0/identifier_select'
 OPEN_ID_IDENTITY = 'http://specs.openid.net/auth/2.0/identifier_select'
 FORMAT_STEAM_AUTH_URL = 'https://steamcommunity.com/openid/login?{}'
 
-CELERY_BROKER_URL = 'redis://localhost:6379'
-CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+if int(os.getenv('DOCKER')):
+    CELERY_BROKER_URL = 'redis://redis:6379'
+    CELERY_RESULT_BACKEND = 'redis://redis:6379'
+else:
+    CELERY_BROKER_URL = 'redis://localhost:6379'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
 CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TASK_SERIALIZER = 'json'
