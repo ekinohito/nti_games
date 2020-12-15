@@ -18,12 +18,12 @@ from . import tasks
 
 
 def index_page(request):
-    return render(request, 'index.html')
+    return render(request, 'games/index.html')
 
 
 @login_required
 def user_page(request):
-    return render(request, 'user_page.html', {'user': request.user})
+    return render(request, 'games/user_page.html', {'user': request.user})
 
 
 def login_page(request):
@@ -34,7 +34,7 @@ def login_page(request):
         talent.authorization_endpoint, response_type='code',
         nonce=time.time(), redirect_uri=redirect_uri
     )
-    return render(request, 'login.html', {'url': uri})
+    return render(request, 'games/login.html', {'url': uri})
 
 
 def auth_page(request):
@@ -133,7 +133,7 @@ def logout_page(request):
 
 @login_required
 def analyse_page(request):
-    return render(request, 'analyse.html', {'user': request.user})
+    return render(request, 'games/analyse.html', {'user': request.user})
 
 
 @login_required
