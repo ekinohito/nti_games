@@ -29,7 +29,7 @@ def user_page(request):
 def login_page(request):
     # TODO: Разобраться с ссылкой и https
 
-    redirect_uri = request.build_absolute_uri(reverse('auth'))
+    redirect_uri = generate_uri(request, reverse('auth'))
     uri, state = talent.get_oauth_sess().create_authorization_url(
         talent.authorization_endpoint, response_type='code',
         nonce=time.time(), redirect_uri=redirect_uri
@@ -47,7 +47,7 @@ def auth_page(request):
         'nonce': time.time(),
         'client_id': talent.client_id,
         'client_secret': talent.client_secret,
-        'redirect_uri': request.build_absolute_uri(reverse('auth')),
+        'redirect_uri': generate_uri(request, reverse('auth')),
         'code': request.GET['code'],
     }).json()
 
@@ -83,14 +83,14 @@ def register_user(talent_info: talent.TalentInfo, token):
 
 @login_required
 def steam_login(request):
-    redirect_uri = request.build_absolute_uri(reverse('steam_auth'))
+    redirect_uri = generate_uri(request, reverse('steam_auth'))
     params = {
         'openid.ns': settings.OPEN_ID_NS,
         'openid.identity': settings.OPEN_ID_IDENTITY,
         'openid.claimed_id': settings.OPEN_ID_CLAIMED_ID,
         'openid.mode': 'checkid_setup',
         'openid.return_to': redirect_uri,
-        'openid.realm': request.build_absolute_uri(reverse('index')),
+        'openid.realm': generate_uri(request, reverse('index')),
     }
 
     auth_url = settings.FORMAT_STEAM_AUTH_URL.format(urlencode(params))
@@ -165,3 +165,11 @@ def task_status(request, task_id):
         ctx['result'] = task.get()
 
     return JsonResponse(ctx)
+
+
+def generate_uri(request, rev):
+    uri = request.build_absolute_uri(rev)
+    if settings.HTTPS_ONLY:
+        uri = uri.replace('http', 'https')
+
+    return uri
