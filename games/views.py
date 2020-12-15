@@ -2,7 +2,7 @@ import json
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout, login
@@ -10,6 +10,7 @@ from django.urls import reverse
 from django.conf import settings
 import requests
 import time
+from celery import current_app
 
 from .models import TalantUser
 from . import talent
@@ -26,6 +27,8 @@ def user_page(request):
 
 
 def login_page(request):
+    # TODO: Разобраться с ссылкой и https
+
     redirect_uri = request.build_absolute_uri(reverse('auth'))
     uri, state = talent.get_oauth_sess().create_authorization_url(
         talent.authorization_endpoint, response_type='code',
@@ -135,20 +138,30 @@ def analyse_page(request):
 
 @login_required
 def dota_analyse(request):
+    ctx = {}
+
     if request.method == 'POST':
         user = request.user
-        # slug = request.POST.get('slug', None)
-        # company = get_object_or_404(Company, slug=slug)
 
         if user.talantuser.dota_process or user.talantuser.steam_id is None:
-            return
+            ctx['error'] = "Приыяжите Steam к аккаунту"
+            return JsonResponse(ctx)
 
-        user.talantuser.dota_process = 1
+        task = tasks.dota_count.delay(user.pk)
+        user.talantuser.dota_task = task.id
         user.talantuser.save()
 
-        tasks.dota_count.delay(user.pk)
+        ctx['task_id'] = task.id
+
+    return JsonResponse(ctx)
 
 
-    # ctx = {'likes_count': company.total_likes, 'message': message}
-    # use mimetype instead of content_type if django < 5
-    return HttpResponse(json.dumps({}), content_type='application/json')
+def task_status(request, task_id):
+    ctx = {}
+    task = current_app.AsyncResult(task_id)
+    ctx['status'] = task.status
+
+    if task.status == 'SUCCESS':
+        ctx['result'] = task.get()
+
+    return JsonResponse(ctx)

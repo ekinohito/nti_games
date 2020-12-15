@@ -14,8 +14,17 @@ def dota_count(user_id: int):
     steam_id = user.talantuser.steam_id
 
     dota = DotaAnalysing(76561198397930966 - steam_id)
-    res = dota.start()
+    try:
+        res = dota.start()
+    except Exception as e:
+        user.talantuser.dota_result = None
+        user.talantuser.dota_task = ''
+        user.talantuser.save()
 
-    user.talantuser.dota_process = False
+        raise e
+
     user.talantuser.dota_result = res
+    user.talantuser.dota_task = ''
     user.talantuser.save()
+
+    return res

@@ -6,36 +6,119 @@
     <div>
         <h2>Dota:</h2>
         {% if user.talantuser.dota_result %}
-            <p>Твой score: {{ user.talantuser.dota_result }}</p>
-            {#<a class="btn btn-outline-primary" href="{% url 'steam_logout' %}" role="button">Отвязать</a>#}
+            <div id="score">
+                <p id="score_line">Твой score: </p>
+                <p id="score_num">{{ user.talantuser.dota_result }}</p>
+            </div>
+
         {% else %}
-            <p>Не проанализировано</p>
-            {#<a class="btn btn-primary" href="{% url 'steam_login' %}" role="button">Привязать</a>#}
+            <div id="score_line">
+                <p id="score_line">Не проанализировано</p>
+                <p id="score_num" style="visibility: hidden">{{ user.talantuser.dota_result }}</p>
+            </div>
         {% endif %}
 
-        {% if user.talantuser.dota_process %}
-            <p>В процессе обработки</p>
-        {% else %}
-            <input type="button" id="dota_process" class="btn btn-primary" name="{{ company_slug }}" value="Начать анализ"/>
+        <input type="button" id="dota_process" class="btn btn-primary" name="{{ company_slug }}"
+               value="Начать анализ"/>
 
-            <script>
-                $('#dota_process').click(function () {
+        <script>
+
+            function check() {
+                if ("{{ user.talantuser.dota_task }}") {
+                    start_checking_result({'task_id': "{{user.talantuser.dota_task}}"});
+                }
+            }
+
+            check();
+
+            $('#dota_process').click(function () {
+                $.ajax({
+                    type: "POST",
+                    url: "{% url 'analyse-dota' %}",
+                    data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                    dataType: "json",
+                    success: start_checking_result,
+                    error: function (rs, e) {
+                        {#alert(rs.responseText);#}
+                    }
+                });
+            })
+
+            function start_checking_result(response) {
+                if (check_errors(response)) return;
+                document.getElementById("dota_process").style.visibility = "hidden";
+                document.getElementById("score_num").style.visibility = "hidden";
+                update_score_line("В процессе обработки...")
+                check_res(response.task_id);
+            }
+
+            function check_res(task_id) {
+                var timerId = setInterval(function () {
                     $.ajax({
-                        type: "POST",
-                        url: "{% url 'analyse-dota' %}",
-                        data: {'csrfmiddlewaretoken': '{{ csrf_token }}'},
+                        type: "GET",
+                        url: `/analyse/status/${task_id}`,
                         dataType: "json",
                         success: function (response) {
-                            {#alert(response.message);#}
-                            {#alert('Company likes count is now ' + response.likes_count);#}
+                            console.log(response);
+                            if (response.status === "SUCCESS") {
+                                document.getElementById("dota_process").style.visibility = "";
+                                document.getElementById("score_num").style.visibility = "";
+                                document.getElementById("score_num").innerText = response.result;
+                                document.getElementById("score_line").innerText = "Твой score: "
+                                clearInterval(timerId);
+                            }
+                            if (response.status === "FAILURE") {
+                                check_errors(response);
+                                document.getElementById("dota_process").style.visibility = "";
+                                update_score_line("Что-то пошло не так");
+                                clearInterval(timerId);
+                            }
                         },
                         error: function (rs, e) {
                             {#alert(rs.responseText);#}
                         }
                     });
-                })
-            </script>
 
-        {% endif %}
+                }, 1000);
+            }
+
+            function update_score_line(message) {
+                document.getElementById("score_line").innerText = message;
+            }
+
+            function check_errors(response) {
+                if (response.error) {
+                    alert(response.error)
+                    return true;
+                }
+                return false;
+            }
+
+
+            {#var timer = setInterval(function () {#}
+            {#    axios.get(taskUrl)#}
+            {#        .then(function (response) {#}
+            {#            var taskStatus = response.data.task_status#}
+            {#            if (taskStatus === 'SUCCESS') {#}
+            {#                clearTimer('Check downloads for results');#}
+            {#                var url = window.location.protocol + '//' + window.location.host + response.data.results.archive_path;#}
+            {#                var a = document.createElement("a");#}
+            {#                a.target = '_BLANK';#}
+            {#                document.body.appendChild(a);#}
+            {#                a.style = "display: none";#}
+            {#                a.href = url;#}
+            {#                a.download = 'results.zip';#}
+            {#                a.click();#}
+            {#                document.body.removeChild(a);#}
+            {#            } else if (taskStatus === 'FAILURE') {#}
+            {#                clearTimer('An error occurred');#}
+            {#            }#}
+            {#        })#}
+            {#        .catch(function (err) {#}
+            {#            console.log('err', err);#}
+            {#            clearTimer('An error occurred');#}
+            {#        });#}
+            {# }, 800);#}
+        </script>
     </div>
 {% endblock %}
