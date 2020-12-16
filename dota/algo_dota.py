@@ -61,22 +61,28 @@ class DotaAnalysing:
 
     def get_final_res(self, a, b, c, d, e, f, solo_empty, party_empty):
         if solo_empty:
-            return {"score": round((0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) / 0.75, 2),
-                    "role": round(a, 2),
-                    "comparing_skill": round(b[0], 2),
+            score = round((0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) / 0.75, 2)
+            return {"score": score,
+                    "text_score": self.get_text_score(score),
+                    "role": "Core" if round(a, 2) <= 60 else "Support",
+                    "comparing_skill": self.get_comparing_text(round(b[0], 2)),
                     "benefit": round(b[1], 2),
                     "frequency_fight": round(c, 2)}
         if party_empty:
-            return {"score": round((0.9 * (0.4 * d + 0.225 * (e[0] + e[1]) + 0.15 * f)) / 0.75, 2),
-                    "role": round(d, 2),
-                    "comparing_skill": round(e[0], 2),
+            score = round((0.9 * (0.4 * d + 0.225 * (e[0] + e[1]) + 0.15 * f)) / 0.75, 2)
+            return {"score": score,
+                    "text_score": self.get_text_score(score),
+                    "role": "Core" if round(d, 2) <= 60 else "Support",
+                    "comparing_skill": self.get_comparing_text(round(e[0], 2)),
                     "benefit": round(e[1], 2),
                     "frequency_fight": round(f, 2)}
 
-        return {"score": round((0.55 * (0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) + 0.45 * 0.9 * (
-                    0.4 * d + 0.225 * (e[0] + e[1]) + 0.15 * f) / 0.75), 2),
-                "role":  round((a + d), 2),
-                "comparing_skill": round((b[0] + e[0]) / 2, 2),
+        score = round((0.55 * (0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) + 0.45 * 0.9 * (
+                    0.4 * d + 0.225 * (e[0] + e[1]) + 0.15 * f) / 0.75), 2)
+        return {"score": score,
+                "text_score": self.get_text_score(score),
+                "role": "Core" if round((a + d), 2) <= 60 else "Support",
+                "comparing_skill": self.get_comparing_text(round((b[0] + e[0]) / 2, 2)),
                 "benefit": round((b[1] + e[1]) / 2, 2),
                 "frequency_fight": round((f + c) / 2, 2)}
 
@@ -167,6 +173,24 @@ class DotaAnalysing:
 
         if send_request:
             sleep(20)
+
+    def get_comparing_text(self, n):
+        text = "Ваши показатели {} чем показатели других игроков на {}% на вашем рейтинге"
+        if n < 50:
+            return text.format("хуже", 50 - n)
+        else:
+            return text.format("лучше", n - 50)
+
+    def get_text_score(self, n):
+        text = "В игре Dota 2 у вас {} командная работа"
+        if n < 55:
+            return text.format("плохая")
+        elif 55 <= n < 72:
+            return text.format("средная")
+        elif 72 <= n < 83:
+            return text.format("хорошая")
+        elif 83 <= n:
+            return text.format("отличная")
 
     def check_dire_radiant(self, num):
         return "radiant" if num in range(0, 128) else "dire"

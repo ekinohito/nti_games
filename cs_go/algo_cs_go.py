@@ -74,6 +74,7 @@ class CSGOAnalysing:
 
         dct = {
             "score": (avg_cs + kd + plant_n_defuse + donate + mvp) * 20,
+            "text_score": self.get_text_score((avg_cs + kd + plant_n_defuse + donate + mvp) * 20),
             "kd": round(self.data['total_kills'] / self.data['total_deaths'], 2),
             "avg_cs": round(self.data['total_contribution_score'] / self.data['total_matches_played']),
             "avg_plant_defuse": round(self.data['total_rounds_played'] /
@@ -85,6 +86,17 @@ class CSGOAnalysing:
 
     def get_data(self):
         return self.get_request()['playerstats']['stats']
+
+    def get_text_score(self, n):
+        text = "В игре CS:GO у вас {} командная работа"
+        if n < 55:
+            return text.format("плохая")
+        elif 55 <= n < 70:
+            return text.format("средная")
+        elif 70 <= n < 80:
+            return text.format("хорошая")
+        elif 80 <= n:
+            return text.format("отличная")
 
     def get_request(self):
         req = requests.get(f"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&"
