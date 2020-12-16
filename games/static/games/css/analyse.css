@@ -1,0 +1,15 @@
+.score-line p {
+  display: inline;
+}
+
+.score-line {
+  margin-top: 5px;
+  margin-left: 25px;
+  padding: 0;
+}
+
+.score-button {
+  margin-top: 20px;
+  margin-bottom: 30px;
+  margin-left: 25px;
+}
