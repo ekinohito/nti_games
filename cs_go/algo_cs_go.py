@@ -1,4 +1,5 @@
 import requests
+from cs_go.Error import CSGOError
 
 
 class CSGOAnalysing:
@@ -86,5 +87,10 @@ class CSGOAnalysing:
         return self.get_request()['playerstats']['stats']
 
     def get_request(self):
-        return requests.get(
-            f"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&key={self.api_key}&steamid={self.steam_id}").json()
+        req = requests.get(f"http://api.steampowered.com/ISteamUserStats/GetUserStatsForGame/v0002/?appid=730&"
+                           f"key={self.api_key}&steamid={self.steam_id}")
+
+        if req.status_code != 200:
+            raise CSGOError("У вас закрытый аккаунт или вы не играете в CSGO")
+
+        return req.json()
