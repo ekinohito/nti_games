@@ -1,0 +1,35 @@
+{% extends 'games/base.html' %}
+
+{% block content %}
+    <h1>Страница для анализа</h1>
+
+    <div>
+        <h2>Dota:</h2>
+        {% if user.talantuser.dota_result %}
+            <div id="score">
+                <p id="score_line">Твой score: </p>
+                <p id="score_num">{{ user.talantuser.dota_result }}</p>
+            </div>
+
+        {% else %}
+            <div id="score">
+                <p id="score_line">Не проанализировано</p>
+                <p id="score_num" style="visibility: hidden">{{ user.talantuser.dota_result }}</p>
+            </div>
+        {% endif %}
+
+        <input type="button" id="dota_process" class="btn btn-primary" name="{{ company_slug }}"
+               value="Начать анализ"/>
+    </div>
+
+    <script>
+        let temp_task_id = "{{ user.talantuser.dota_task }}";
+        let temp_csrf_token = "{{ csrf_token }}";
+        let temp_dota_start_url = "{% url 'analyse-dota' %}";
+    </script>
+{% endblock %}
+
+{% block scripts %}
+    {% load static %}
+    <script src="{% static 'games/js/analyse.js' %}"></script>
+{% endblock %}

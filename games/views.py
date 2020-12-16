@@ -2,7 +2,7 @@ import json
 from urllib.parse import urlencode
 
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, logout, login
@@ -10,27 +10,31 @@ from django.urls import reverse
 from django.conf import settings
 import requests
 import time
+from celery import current_app
 
 from .models import TalantUser
 from . import talent
+from . import tasks
 
 
 def index_page(request):
-    return render(request, 'index.html')
+    return render(request, 'games/index.html')
 
 
 @login_required
 def user_page(request):
-    return render(request, 'user_page.html', {'user': request.user})
+    return render(request, 'games/user_page.html', {'user': request.user})
 
 
 def login_page(request):
-    redirect_uri = request.build_absolute_uri(reverse('auth'))
+    # TODO: Разобраться с ссылкой и https
+
+    redirect_uri = generate_uri(request, reverse('auth'))
     uri, state = talent.get_oauth_sess().create_authorization_url(
         talent.authorization_endpoint, response_type='code',
         nonce=time.time(), redirect_uri=redirect_uri
     )
-    return render(request, 'login.html', {'url': uri})
+    return render(request, 'games/login.html', {'url': uri})
 
 
 def auth_page(request):
@@ -43,7 +47,7 @@ def auth_page(request):
         'nonce': time.time(),
         'client_id': talent.client_id,
         'client_secret': talent.client_secret,
-        'redirect_uri': request.build_absolute_uri(reverse('auth')),
+        'redirect_uri': generate_uri(request, reverse('auth')),
         'code': request.GET['code'],
     }).json()
 
@@ -70,7 +74,8 @@ def auth_page(request):
 
 
 def register_user(talent_info: talent.TalentInfo, token):
-    user = User(email=talent_info.email, username=talent_info.email, first_name=talent_info.first_name, last_name=talent_info.last_name)
+    user = User(email=talent_info.email, username=talent_info.email, first_name=talent_info.first_name,
+                last_name=talent_info.last_name)
     user.save()
     talent_user = TalantUser(user=user, access_token=json.dumps(token))
     talent_user.save()
@@ -78,14 +83,14 @@ def register_user(talent_info: talent.TalentInfo, token):
 
 @login_required
 def steam_login(request):
-    redirect_uri = request.build_absolute_uri(reverse('steam_auth'))
+    redirect_uri = generate_uri(request, reverse('steam_auth'))
     params = {
         'openid.ns': settings.OPEN_ID_NS,
         'openid.identity': settings.OPEN_ID_IDENTITY,
         'openid.claimed_id': settings.OPEN_ID_CLAIMED_ID,
         'openid.mode': 'checkid_setup',
         'openid.return_to': redirect_uri,
-        'openid.realm': request.build_absolute_uri(reverse('index')),
+        'openid.realm': generate_uri(request, reverse('index')),
     }
 
     auth_url = settings.FORMAT_STEAM_AUTH_URL.format(urlencode(params))
@@ -114,7 +119,7 @@ def steam_auth(request):
 @login_required
 def steam_logout(request):
     request.user.talantuser.steam_openid = ''
-    request.user.talantuser.steam_id = 0
+    request.user.talantuser.steam_id = None
     request.user.talantuser.save()
 
     return redirect('user_page')
@@ -124,3 +129,47 @@ def steam_logout(request):
 def logout_page(request):
     logout(request)
     return redirect('index')
+
+
+@login_required
+def analyse_page(request):
+    return render(request, 'games/analyse.html', {'user': request.user})
+
+
+@login_required
+def dota_analyse(request):
+    ctx = {}
+
+    if request.method == 'POST':
+        user = request.user
+
+        if user.talantuser.dota_process or user.talantuser.steam_id is None:
+            ctx['error'] = "Приыяжите Steam к аккаунту"
+            return JsonResponse(ctx)
+
+        task = tasks.dota_count.delay(user.pk)
+        user.talantuser.dota_task = task.id
+        user.talantuser.save()
+
+        ctx['task_id'] = task.id
+
+    return JsonResponse(ctx)
+
+
+def task_status(request, task_id):
+    ctx = {}
+    task = current_app.AsyncResult(task_id)
+    ctx['status'] = task.status
+
+    if task.status == 'SUCCESS':
+        ctx['result'] = task.get()
+
+    return JsonResponse(ctx)
+
+
+def generate_uri(request, rev):
+    uri = request.build_absolute_uri(rev)
+    if settings.HTTPS_ONLY:
+        uri = uri.replace('http', 'https')
+
+    return uri
