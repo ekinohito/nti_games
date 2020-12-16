@@ -16,7 +16,7 @@ class DotaAnalysing:
         self.game_solo = []
         self.game_party = []
 
-    def start(self, flag=False):
+    def start(self, flag=True):
         self.get_games_id(flag)
         return self.analysis()
 
@@ -172,7 +172,7 @@ class DotaAnalysing:
             self.game.append([games[x]["match_id"], games[x]["player_slot"]])
 
         if send_request:
-            sleep(20)
+            sleep(30)
 
     def get_comparing_text(self, n):
         text = "Ваши показатели {}, чем показатели других игроков на {}% на вашем рейтинге"
