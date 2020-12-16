@@ -92,7 +92,7 @@ class CSGOAnalysing:
         if n < 55:
             return text.format("плохая")
         elif 55 <= n < 70:
-            return text.format("средная")
+            return text.format("средняя")
         elif 70 <= n < 80:
             return text.format("хорошая")
         elif 80 <= n:

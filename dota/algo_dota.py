@@ -175,7 +175,7 @@ class DotaAnalysing:
             sleep(20)
 
     def get_comparing_text(self, n):
-        text = "Ваши показатели {} чем показатели других игроков на {}% на вашем рейтинге"
+        text = "Ваши показатели {}, чем показатели других игроков на {}% на вашем рейтинге"
         if n < 50:
             return text.format("хуже", 50 - n)
         else:
@@ -186,7 +186,7 @@ class DotaAnalysing:
         if n < 55:
             return text.format("плохая")
         elif 55 <= n < 72:
-            return text.format("средная")
+            return text.format("средняя")
         elif 72 <= n < 83:
             return text.format("хорошая")
         elif 83 <= n:
