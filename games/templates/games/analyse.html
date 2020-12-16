@@ -14,18 +14,26 @@
                 </div>
 
                 <div class="score-line">
-                    <p>Командный score: </p>
+                    <p id="dota-text_score-score">{{ dota_result.text_score }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p class="additional-info">Дополнительная информация:</p>
+                </div>
+
+                <div class="score-line">
+                    <p>Роль: </p>
                     <p id="dota-role-score">{{ dota_result.role }}</p>
                 </div>
 
                 <div class="score-line">
-                    <p>Сравнительный с другими игроками score: </p>
                     <p id="dota-comparing_skill-score">{{ dota_result.comparing_skill }}</p>
                 </div>
 
                 <div class="score-line">
-                    <p>Score полезности: </p>
+                    <p>Средний процент полезности принесенный команде: </p>
                     <p id="dota-benefit-score">{{ dota_result.benefit }}</p>
+                    <p>%</p>
                 </div>
 
                 <div class="score-line">
@@ -43,18 +51,26 @@
                 </div>
 
                 <div class="score-line">
-                    <p>Командный score: </p>
+                    <p id="dota-text_score-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p class="additional-info">Дополнительная информация:</p>
+                </div>
+
+                <div class="score-line">
+                    <p>Роль: </p>
                     <p id="dota-role-score"></p>
                 </div>
 
                 <div class="score-line">
-                    <p>Сравнительный с другими игроками score: </p>
                     <p id="dota-comparing_skill-score"></p>
                 </div>
 
                 <div class="score-line">
-                    <p>Score полезности: </p>
+                    <p>Средний процент полезности принесенный команде: </p>
                     <p id="dota-benefit-score"></p>
+                    <p>%</p>
                 </div>
 
                 <div class="score-line">
@@ -81,6 +97,15 @@
                 </div>
 
                 <div class="score-line">
+                    <p id="cs-text_score-score">{{ cs_result.text_score }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p class="additional-info">Дополнительная информация:</p>
+                </div>
+
+
+                <div class="score-line">
                     <p>Отношение убийств к смертям: </p>
                     <p id="cs-kd-score">{{ cs_result.kd }}</p>
                 </div>
@@ -91,18 +116,20 @@
                 </div>
 
                 <div class="score-line">
-                    <p>Количество раундов, в которых игрок ставит ил обезвреживает бомбу: </p>
-                    <p id="cs-avg_plant_defuse-score">{{ cs_result.avg_plant_defuse }}</p>
+                    <p>В среднем, каждые
+                    <p id="cs-avg_plant_defuse-score">{{ cs_result.avg_plant_defuse }}</p> раундов ты ставил или
+                    обезвреживал бомбу</p>
                 </div>
 
                 <div class="score-line">
-                    <p>Количество раундов, в которых игрок скидывает оружие противнику: </p>
-                    <p id="cs-avg_give_weapon-score">{{ cs_result.avg_give_weapon }}</p>
+                    <p>В среднем, каждые
+                    <p id="cs-avg_give_weapon-score">{{ cs_result.avg_give_weapon }}</p> раундов ты отдавал союзнику
+                    оружие</p>
                 </div>
 
                 <div class="score-line">
-                    <p>Каждый раунд ты мвп: </p>
-                    <p id="cs-avg_mvp-score">{{ cs_result.avg_mvp }}</p>
+                    <p>В среднем, каждые
+                    <p id="cs-avg_mvp-score">{{ cs_result.avg_mvp }}</p> раунда ты MVP</p>
                 </div>
             </div>
         {% else %}
@@ -111,6 +138,14 @@
                 <div class="score-line">
                     <p>Общий score: </p>
                     <p id="cs-score-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p id="cs-text_score-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p class="additional-info">Дополнительная информация:</p>
                 </div>
 
                 <div class="score-line">
@@ -124,18 +159,18 @@
                 </div>
 
                 <div class="score-line">
-                    <p>Количество раундов, в которых игрок ставит ил обезвреживает бомбу: </p>
-                    <p id="cs-avg_plant_defuse-score"></p>
+                    <p>В среднем, каждые
+                    <p id="cs-avg_plant_defuse-score"></p> раундов ты ставил или обезвреживал бомбу</p>
                 </div>
 
                 <div class="score-line">
-                    <p>Количество раундов, в которых игрок скидывает оружие противнику: </p>
-                    <p id="cs-avg_give_weapon-score"></p>
+                    <p>В среднем, каждые
+                    <p id="cs-avg_give_weapon-score"></p> раундов ты отдавал союзнику оружие</p>
                 </div>
 
                 <div class="score-line">
-                    <p>В среднем, каждый n раундов ты мвп: </p>
-                    <p id="cs-avg_mvp-score"></p>
+                    <p>В среднем, каждые
+                    <p id="cs-avg_mvp-score"></p> раунда ты MVP</p>
                 </div>
             </div>
         {% endif %}
