@@ -12,8 +12,8 @@ class TalantUser(models.Model):
     dota_process = models.BooleanField(default=False)
     cs_process = models.BooleanField(default=False)
 
-    dota_result = models.FloatField(default=None, null=True)
-    cs_result = models.FloatField(default=None, null=True)
+    dota_result = models.CharField(default=None, null=True, max_length=2500)
+    cs_result = models.CharField(default=None, null=True, max_length=2500)
 
     dota_task = models.CharField(max_length=100, default='')
     cs_task = models.CharField(max_length=100, default='')

@@ -11,6 +11,7 @@ from django.conf import settings
 import requests
 import time
 from celery import current_app
+import celery
 
 from .models import TalantUser
 from . import talent
@@ -133,7 +134,13 @@ def logout_page(request):
 
 @login_required
 def analyse_page(request):
-    return render(request, 'games/analyse.html', {'user': request.user})
+    return render(request, 'games/analyse.html', {
+        'user': request.user,
+        'dota_result': None if request.user.talantuser.dota_result is None else json.loads(
+            request.user.talantuser.dota_result),
+        'cs_result': None if request.user.talantuser.cs_result is None else json.loads(
+            request.user.talantuser.cs_result),
+    })
 
 
 @login_required
@@ -143,8 +150,11 @@ def dota_analyse(request):
     if request.method == 'POST':
         user = request.user
 
-        if user.talantuser.dota_process or user.talantuser.steam_id is None:
-            ctx['error'] = "Приыяжите Steam к аккаунту"
+        if user.talantuser.steam_id is None:
+            ctx['error'] = "Привяжите Steam к аккаунту"
+            return JsonResponse(ctx)
+        if user.talantuser.dota_task:
+            ctx['error'] = 'Задача уже в очереди'
             return JsonResponse(ctx)
 
         task = tasks.dota_count.delay(user.pk)
@@ -156,6 +166,30 @@ def dota_analyse(request):
     return JsonResponse(ctx)
 
 
+@login_required
+def cs_analyse(request):
+    ctx = {}
+
+    if request.method == 'POST':
+        user = request.user
+
+        if user.talantuser.steam_id is None:
+            ctx['error'] = "Привяжите Steam к аккаунту"
+            return JsonResponse(ctx)
+        if user.talantuser.cs_task:
+            ctx['error'] = 'Задача уже в очереди'
+            return JsonResponse(ctx)
+
+        task = tasks.cs_count.delay(user.pk)
+        user.talantuser.cs_task = task.id
+        user.talantuser.save()
+
+        ctx['task_id'] = task.id
+
+    return JsonResponse(ctx)
+
+
+@login_required
 def task_status(request, task_id):
     ctx = {}
     task = current_app.AsyncResult(task_id)
@@ -163,6 +197,8 @@ def task_status(request, task_id):
 
     if task.status == 'SUCCESS':
         ctx['result'] = task.get()
+    if task.status == 'FAILURE':
+        ctx['error'] = str(task.result)
 
     return JsonResponse(ctx)
 

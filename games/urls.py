@@ -10,6 +10,7 @@ urlpatterns = [
 
     path('analyse/', views.analyse_page, name='analyse'),
     path('analyse/dota/', views.dota_analyse, name='analyse-dota'),
+    path('analyse/cs', views.cs_analyse, name='analyse-cs'),
     path('analyse/status/<str:task_id>/', views.task_status, name='task_status'),
 
     path('steam/login/', views.steam_login, name='steam_login'),

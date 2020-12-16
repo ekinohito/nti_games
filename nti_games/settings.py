@@ -55,6 +55,7 @@ LOGIN_URL = '/login/'
 
 TALANT_CLIENT_ID = os.getenv("TALANT_CLIENT_ID")
 TALANT_CLIENT_SECRET = os.getenv("TALANT_CLIENT_SECRET")
+STEAM_API_KEY = os.getenv("STEAM_API_KEY")
 
 OPEN_ID_NS = 'http://specs.openid.net/auth/2.0'
 OPEN_ID_CLAIMED_ID = 'http://specs.openid.net/auth/2.0/identifier_select'

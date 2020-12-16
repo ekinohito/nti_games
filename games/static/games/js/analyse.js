@@ -1,6 +1,9 @@
 function check() {
-    if (temp_task_id) {
-        start_checking_result({'task_id': temp_task_id});
+    if (temp_task_dota_id) {
+        start_checking_result_dota({'task_id': temp_task_dota_id});
+    }
+    if (temp_task_cs_id) {
+        start_checking_result_cs({'task_id': temp_task_cs_id})
     }
 }
 
@@ -12,7 +15,7 @@ $('#dota_process').click(function () {
         url: temp_dota_start_url,
         data: {'csrfmiddlewaretoken': temp_csrf_token},
         dataType: "json",
-        success: start_checking_result,
+        success: start_checking_result_dota,
         error: function (rs, e) {
             {
                 // alert(rs.responseText);
@@ -21,15 +24,39 @@ $('#dota_process').click(function () {
     });
 })
 
-function start_checking_result(response) {
-    if (check_errors(response)) return;
-    document.getElementById("dota_process").style.visibility = "hidden";
-    document.getElementById("score_num").style.visibility = "hidden";
-    update_score_line("В процессе обработки...")
-    check_res(response.task_id);
+$('#cs_process').click(function () {
+    $.ajax({
+        type: "POST",
+        url: temp_cs_start_url,
+        data: {'csrfmiddlewaretoken': temp_csrf_token},
+        dataType: "json",
+        success: start_checking_result_cs,
+        error: function (rs, e) {
+            {
+                // alert(rs.responseText);
+            }
+        }
+    });
+})
+
+function start_checking_result_dota(response) {
+    start_checking_result(response, 'dota')
 }
 
-function check_res(task_id) {
+function start_checking_result_cs(response) {
+    start_checking_result(response, 'cs')
+}
+
+function start_checking_result(response, block) {
+    if (check_errors(response, block)) return;
+
+    hide_score(block);
+    update_message("В процессе обработки...", block);
+
+    check_res(response.task_id, block);
+}
+
+function check_res(task_id, block) {
     var timerId = setInterval(function () {
         $.ajax({
             type: "GET",
@@ -38,23 +65,18 @@ function check_res(task_id) {
             success: function (response) {
                 console.log(response);
                 if (response.status === "SUCCESS") {
-                    document.getElementById("dota_process").style.visibility = "";
-                    document.getElementById("score_num").style.visibility = "";
-                    document.getElementById("score_num").innerText = response.result;
-                    update_score_line("Твой score: ");
+                    update_score(block, response.result);
+                    hide_message(block);
                     clearInterval(timerId);
                 }
                 if (response.status === "FAILURE") {
-                    check_errors(response);
-                    document.getElementById("dota_process").style.visibility = "";
-                    update_score_line("Что-то пошло не так");
+                    check_errors(response, block);
                     clearInterval(timerId);
                 }
             },
             error: function (rs, e) {
                 {
-                    alert(rs.responseText);
-
+                    // alert(rs.responseText);
                 }
             }
         });
@@ -62,13 +84,39 @@ function check_res(task_id) {
     }, 1000);
 }
 
-function update_score_line(message) {
-    document.getElementById("score_line").innerText = message;
+function update_message(message, block) {
+    show_message(block);
+    document.getElementById(`${block}-info`).innerText = message;
 }
 
-function check_errors(response) {
+function show_message(block) {
+    document.getElementById(`${block}-info`).style.display = "";
+}
+
+function hide_message(block) {
+    document.getElementById(`${block}-info`).style.display = "none";
+}
+
+function show_score(block) {
+    document.getElementById(`${block}-score`).style.display = "";
+}
+
+function hide_score(block) {
+    document.getElementById(`${block}-score`).style.display = "none";
+}
+
+function update_score(block, score) {
+    show_score(block);
+    console.log(score)
+    for (const [key, value] of Object.entries(score)) {
+        console.log(key, value)
+        document.getElementById(`${block}-${key}-score`).innerText = value;
+    }
+}
+
+function check_errors(response, block) {
     if (response.error) {
-        alert(response.error)
+        update_message(response.error, block)
         return true;
     }
     return false;
