@@ -1,7 +1,7 @@
 import requests
 from time import sleep
 from dota.counter import Counter
-
+from dota.MyError import DotaError
 LIMIT = 20
 
 
@@ -11,13 +11,13 @@ class DotaAnalysing:
         self.side = ""
         self.party = 0
         self.info_about_game = {}
-        self.steam_id = steam_id
+        self.steam_id = steam_id - 76561197960265728
         self.game = []
         self.game_solo = []
         self.game_party = []
 
-    def start(self):
-        self.get_games_id(False)
+    def start(self, flag=False):
+        self.get_games_id(flag)
         return self.analysis()
 
     def analysis(self):
@@ -28,7 +28,7 @@ class DotaAnalysing:
             self.party = 0
             self.side = self.check_dire_radiant(slot)
             self.info_about_game = self.get_response_matches(id_game)
-            print(self.info_about_game)
+
             role_weight = self.count_roles(self.side)
             pk_weight = self.count_kill_participating()
             comparing_weight = self.count_comparing()
@@ -60,14 +60,25 @@ class DotaAnalysing:
                                   solo.check_is_empty(), party.check_is_empty())
 
     def get_final_res(self, a, b, c, d, e, f, solo_empty, party_empty):
-        print(a, b, c, d, e, f)
         if solo_empty:
-            return 0.4 * a + 0.22 * (b[0] + b[1]) + 0.15 * c
+            return {"score": round((0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) / 0.75, 2),
+                    "role": round(a, 2),
+                    "comparing_skill": round(b[0], 2),
+                    "benefit": round(b[1], 2),
+                    "frequency_fight": round(c, 2)}
         if party_empty:
-            return 0.9 * (0.4 * d + 0.22 * (e[0] + e[1]) + 0.15 * f)
+            return {"score": round((0.9 * (0.4 * d + 0.225 * (e[0] + e[1]) + 0.15 * f)) / 0.75, 2),
+                    "role": round(d, 2),
+                    "comparing_skill": round(e[0], 2),
+                    "benefit": round(e[1], 2),
+                    "frequency_fight": round(f, 2)}
 
-        return 0.55 * (0.4 * a + 0.22 * (b[0] + b[1]) + 0.15 * c) + 0.45 * 0.9 * (
-                    0.4 * d + 0.22 * (e[0] + e[1]) + 0.15 * f)
+        return {"score": round((0.55 * (0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) + 0.45 * 0.9 * (
+                    0.4 * d + 0.225 * (e[0] + e[1]) + 0.15 * f) / 0.75), 2),
+                "role":  round((a + d), 2),
+                "comparing_skill": round((b[0] + e[0]) / 2, 2),
+                "benefit": round((b[1] + e[1]) / 2, 2),
+                "frequency_fight": round((f + c) / 2, 2)}
 
     def count_fantasy(self):
         weight = {"kills": 0.3,
@@ -114,6 +125,10 @@ class DotaAnalysing:
             if players[i]["account_id"] == self.steam_id:
                 self.index = i
                 party_id = players[i]["party_id"]
+
+                if "lane_role" not in players[i]:
+                    raise DotaError("Недостаточно наиграно матчей в этом патче")
+
                 lane = players[i]["lane_role"]
                 gold_per_min = players[i]["gold_per_min"]
 
@@ -139,11 +154,15 @@ class DotaAnalysing:
 
     def get_games_id(self, send_request):
         games = self.get_response_players("matches", limit=LIMIT, game_mode=22)
+        if len(games) == 0:
+            raise DotaError("Вы не играете в доту или закрыт аккаунт")
+        elif len(games) < LIMIT:
+            raise DotaError("Недостаточно игр")
+
         for x in range(LIMIT):
             if send_request:
                 self.post_matches(games[x]["match_id"])
                 print("DONE!", x)
-
             self.game.append([games[x]["match_id"], games[x]["player_slot"]])
 
         if send_request:
@@ -154,7 +173,6 @@ class DotaAnalysing:
 
     def post_matches(self, matches_id):
         x = requests.post(f"https://api.opendota.com/api/request/{matches_id}")
-        print(x.status_code)
 
     def get_response_matches(self, matches_id):
         return requests.get(f"https://api.opendota.com/api/matches/{matches_id}").json()
