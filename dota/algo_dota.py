@@ -177,9 +177,9 @@ class DotaAnalysing:
     def get_comparing_text(self, n):
         text = "Ваши показатели {}, чем показатели других игроков на {}% на вашем рейтинге"
         if n < 50:
-            return text.format("хуже", 50 - n)
+            return text.format("хуже", round(50 - n, 2))
         else:
-            return text.format("лучше", n - 50)
+            return text.format("лучше", round(n - 50, 2))
 
     def get_text_score(self, n):
         text = "В игре Dota 2 у вас {} командная работа"
