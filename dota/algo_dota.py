@@ -16,7 +16,7 @@ class DotaAnalysing:
         self.game_solo = []
         self.game_party = []
 
-    def start(self, flag=True):
+    def start(self, flag=False):
         self.get_games_id(flag)
         return self.analysis()
 
@@ -25,29 +25,35 @@ class DotaAnalysing:
         solo = Counter()
 
         for id_game, slot in self.game:
-            self.party = 0
-            self.side = self.check_dire_radiant(slot)
-            self.info_about_game = self.get_response_matches(id_game)
+            try:
+                self.party = 0
+                self.side = self.check_dire_radiant(slot)
+                self.info_about_game = self.get_response_matches(id_game)
 
-            role_weight = self.count_roles(self.side)
-            pk_weight = self.count_kill_participating()
-            comparing_weight = self.count_comparing()
-            fantasy_weigth = self.count_fantasy()
+                role_weight = self.count_roles(self.side)
+                pk_weight = self.count_kill_participating()
+                comparing_weight = self.count_comparing()
+                fantasy_weigth = self.count_fantasy()
 
-            if self.party > 1:
-                self.game_party.append(id_game)
-                party.role += role_weight
-                party.pk_weight += pk_weight
-                party.num += 1
-                party.comparing += comparing_weight
-                party.fantasy += fantasy_weigth
-            else:
-                self.game_solo.append(id_game)
-                solo.role += role_weight
-                solo.pk_weight += pk_weight
-                solo.num += 1
-                solo.comparing += comparing_weight
-                solo.fantasy += fantasy_weigth
+                if self.party > 1:
+                    self.game_party.append(id_game)
+                    party.role += role_weight
+                    party.pk_weight += pk_weight
+                    party.num += 1
+                    party.comparing += comparing_weight
+                    party.fantasy += fantasy_weigth
+                else:
+                    self.game_solo.append(id_game)
+                    solo.role += role_weight
+                    solo.pk_weight += pk_weight
+                    solo.num += 1
+                    solo.comparing += comparing_weight
+                    solo.fantasy += fantasy_weigth
+            except:
+                pass
+
+        if solo.num == 0 and party.num == 0:
+            raise DotaError("Матчи были сыграны давно, невозможно сделать подробный анализ")
 
         party_pk = party.count_pk()
         solo_pk = solo.count_pk()
