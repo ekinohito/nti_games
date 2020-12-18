@@ -159,6 +159,7 @@ class DotaAnalysing:
         return weight
 
     def get_games_id(self, send_request):
+        self.refresh_players()
         games = self.get_response_players("matches", limit=LIMIT, game_mode=22)
         if len(games) == 0:
             raise DotaError("Вы не играете в доту или закрыт аккаунт")
@@ -194,6 +195,10 @@ class DotaAnalysing:
 
     def check_dire_radiant(self, num):
         return "radiant" if num in range(0, 128) else "dire"
+
+    def refresh_players(self):
+        x = requests.post(f"https://api.opendota.com/api/players/{self.steam_id}/refresh")
+        sleep(5)
 
     def post_matches(self, matches_id):
         x = requests.post(f"https://api.opendota.com/api/request/{matches_id}")
