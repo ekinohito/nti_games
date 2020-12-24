@@ -16,7 +16,7 @@ class DotaAnalysing:
         self.game_solo = []
         self.game_party = []
 
-    def start(self, flag=False):
+    def start(self, flag=True):
         self.get_games_id(flag)
         return self.analysis()
 
@@ -52,6 +52,7 @@ class DotaAnalysing:
             except:
                 pass
 
+        print(solo.num, party.num)
         if solo.num == 0 and party.num == 0:
             raise DotaError("Матчи были сыграны давно, невозможно сделать подробный анализ")
 
@@ -66,6 +67,7 @@ class DotaAnalysing:
                                   solo.check_is_empty(), party.check_is_empty())
 
     def get_final_res(self, a, b, c, d, e, f, solo_empty, party_empty):
+        print(a,b,c,d,e,f)
         if solo_empty:
             score = round((0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) / 0.75, 2)
             return {"score": score,
