@@ -16,7 +16,7 @@ class DotaAnalysing:
         self.game_solo = []
         self.game_party = []
 
-    def start(self, flag=False):
+    def start(self, flag=True):
         self.get_games_id(flag)
         return self.analysis()
 
@@ -25,29 +25,36 @@ class DotaAnalysing:
         solo = Counter()
 
         for id_game, slot in self.game:
-            self.party = 0
-            self.side = self.check_dire_radiant(slot)
-            self.info_about_game = self.get_response_matches(id_game)
+            try:
+                self.party = 0
+                self.side = self.check_dire_radiant(slot)
+                self.info_about_game = self.get_response_matches(id_game)
 
-            role_weight = self.count_roles(self.side)
-            pk_weight = self.count_kill_participating()
-            comparing_weight = self.count_comparing()
-            fantasy_weigth = self.count_fantasy()
+                role_weight = self.count_roles(self.side)
+                pk_weight = self.count_kill_participating()
+                comparing_weight = self.count_comparing()
+                fantasy_weigth = self.count_fantasy()
 
-            if self.party > 1:
-                self.game_party.append(id_game)
-                party.role += role_weight
-                party.pk_weight += pk_weight
-                party.num += 1
-                party.comparing += comparing_weight
-                party.fantasy += fantasy_weigth
-            else:
-                self.game_solo.append(id_game)
-                solo.role += role_weight
-                solo.pk_weight += pk_weight
-                solo.num += 1
-                solo.comparing += comparing_weight
-                solo.fantasy += fantasy_weigth
+                if self.party > 1:
+                    self.game_party.append(id_game)
+                    party.role += role_weight
+                    party.pk_weight += pk_weight
+                    party.num += 1
+                    party.comparing += comparing_weight
+                    party.fantasy += fantasy_weigth
+                else:
+                    self.game_solo.append(id_game)
+                    solo.role += role_weight
+                    solo.pk_weight += pk_weight
+                    solo.num += 1
+                    solo.comparing += comparing_weight
+                    solo.fantasy += fantasy_weigth
+            except:
+                pass
+
+        print(solo.num, party.num)
+        if solo.num == 0 and party.num == 0:
+            raise DotaError("Матчи были сыграны давно, невозможно сделать подробный анализ")
 
         party_pk = party.count_pk()
         solo_pk = solo.count_pk()
@@ -60,6 +67,7 @@ class DotaAnalysing:
                                   solo.check_is_empty(), party.check_is_empty())
 
     def get_final_res(self, a, b, c, d, e, f, solo_empty, party_empty):
+        print(a,b,c,d,e,f)
         if solo_empty:
             score = round((0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) / 0.75, 2)
             return {"score": score,
@@ -159,6 +167,7 @@ class DotaAnalysing:
         return weight
 
     def get_games_id(self, send_request):
+        self.refresh_players()
         games = self.get_response_players("matches", limit=LIMIT, game_mode=22)
         if len(games) == 0:
             raise DotaError("Вы не играете в доту или закрыт аккаунт")
@@ -172,14 +181,14 @@ class DotaAnalysing:
             self.game.append([games[x]["match_id"], games[x]["player_slot"]])
 
         if send_request:
-            sleep(20)
+            sleep(30)
 
     def get_comparing_text(self, n):
         text = "Ваши показатели {}, чем показатели других игроков на {}% на вашем рейтинге"
         if n < 50:
-            return text.format("хуже", 50 - n)
+            return text.format("хуже", round(50 - n, 2))
         else:
-            return text.format("лучше", n - 50)
+            return text.format("лучше", round(n - 50, 2))
 
     def get_text_score(self, n):
         text = "В игре Dota 2 у вас {} командная работа"
@@ -194,6 +203,10 @@ class DotaAnalysing:
 
     def check_dire_radiant(self, num):
         return "radiant" if num in range(0, 128) else "dire"
+
+    def refresh_players(self):
+        x = requests.post(f"https://api.opendota.com/api/players/{self.steam_id}/refresh")
+        sleep(5)
 
     def post_matches(self, matches_id):
         x = requests.post(f"https://api.opendota.com/api/request/{matches_id}")
