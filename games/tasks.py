@@ -4,13 +4,8 @@ from celery import shared_task
 from django.contrib.auth.models import User
 from django.conf import settings
 
-from dota.algo_dota import DotaAnalysing
-from cs_go.algo_cs_go import  CSGOAnalysing
-
-
-@shared_task
-def adding_task(x, y):
-    return x + y
+from analytics.dota.algo_dota import DotaAnalysing
+from analytics.cs_go.algo_cs_go import  CSGOAnalysing
 
 
 @shared_task

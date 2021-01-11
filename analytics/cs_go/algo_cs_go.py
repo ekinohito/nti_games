@@ -1,5 +1,5 @@
 import requests
-from cs_go.Error import CSGOError
+from analytics.cs_go.error import CSGOError
 
 
 class CSGOAnalysing:

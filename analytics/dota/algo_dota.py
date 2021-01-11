@@ -1,7 +1,7 @@
 import requests
 from time import sleep
-from dota.counter import Counter
-from dota.Error import DotaError
+from analytics.dota.counter import Counter
+from analytics.dota.error import DotaError
 LIMIT = 20
 
 
