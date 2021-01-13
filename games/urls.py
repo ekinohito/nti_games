@@ -15,6 +15,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('', views.index_page, name='index'),
     path('user/', views.user_page, name='user_page'),
+    path('analyse/', views.analyse_page, name='analyse'),
 
     path('api/auth/login/talent', views.AuthLoginTalent.as_view(), name='api_auth_login_talent'),
     path('api/auth/complete/talent', views.AuthCompleteTalent.as_view(), name='api_auth_complete_talent'),
@@ -24,7 +25,6 @@ urlpatterns = [
     path('api/auth/complete/steam/', views.AuthCompleteSteam.as_view(), name='steam_auth'),
     path('api/logout/steam', views.LogoutSteam.as_view(), name='steam_logout'),
 
-    path('analyse/', views.analyse_page, name='analyse'),
     path('analyse/dota/', views.dota_analyse, name='analyse-dota'),
     path('analyse/cs', views.cs_analyse, name='analyse-cs'),
     path('analyse/status/<str:task_id>/', views.task_status, name='task_status'),
