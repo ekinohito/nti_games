@@ -14,19 +14,20 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('', views.index_page, name='index'),
-    path('login/', views.login_page, name='login'),
-    path('auth/', views.auth_page, name='auth'),
-    path('logout/', views.logout_page, name='logout'),
     path('user/', views.user_page, name='user_page'),
+
+    path('api/auth/login/talent', views.AuthLoginTalent.as_view(), name='api_auth_login_talent'),
+    path('api/auth/complete/talent', views.AuthCompleteTalent.as_view(), name='api_auth_complete_talent'),
+    path('api/logout/talent', views.LogoutTalent.as_view(), name='logout'),
+
+    path('api/auth/login/steam/', views.AuthLoginSteam.as_view(), name='steam_login'),
+    path('api/auth/complete/steam/', views.AuthCompleteSteam.as_view(), name='steam_auth'),
+    path('api/logout/steam', views.LogoutSteam.as_view(), name='steam_logout'),
 
     path('analyse/', views.analyse_page, name='analyse'),
     path('analyse/dota/', views.dota_analyse, name='analyse-dota'),
     path('analyse/cs', views.cs_analyse, name='analyse-cs'),
     path('analyse/status/<str:task_id>/', views.task_status, name='task_status'),
-
-    path('steam/login/', views.steam_login, name='steam_login'),
-    path('steam/auth/', views.steam_auth, name='steam_auth'),
-    path('steam/logout/', views.steam_logout, name='steam_logout'),
 
     path('api/user', views.CurrentUserView.as_view(), ),
     path('api/user/games', views.CurrentTalentUserView.as_view(), ),
