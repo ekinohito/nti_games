@@ -9,9 +9,6 @@ class TalantUser(models.Model):
     steam_openid = models.CharField(max_length=200, default='')
     steam_id = models.BigIntegerField(default=None, null=True)
 
-    dota_process = models.BooleanField(default=False)
-    cs_process = models.BooleanField(default=False)
-
     dota_result = models.CharField(default=None, null=True, max_length=2500)
     cs_result = models.CharField(default=None, null=True, max_length=2500)
 

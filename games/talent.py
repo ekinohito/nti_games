@@ -17,10 +17,6 @@ class TalentInfo:
     last_name: str
 
 
-def get_oauth_sess():
-    return OAuth2Session(client_id, client_secret)
-
-
 def get_talent_info(token) -> TalentInfo:
     client = OAuth2Session(client_id, client_secret, token=token)
     # id, email, first_name, last_name

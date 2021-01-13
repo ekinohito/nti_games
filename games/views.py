@@ -11,11 +11,30 @@ from django.conf import settings
 import requests
 import time
 from celery import current_app
-import celery
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from . import serializers
 
 from .models import TalantUser
 from . import talent
 from . import tasks
+
+
+class CurrentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = serializers.CurrentUserSerializer(request.user)
+        return Response(serializer.data)
+
+
+class CurrentTalentUserView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = serializers.TalentUserSerializer(request.user.talantuser)
+        return Response(serializer.data)
 
 
 def index_page(request):
@@ -28,10 +47,8 @@ def user_page(request):
 
 
 def login_page(request):
-    # TODO: Разобраться с ссылкой и https
-
     redirect_uri = generate_uri(request, reverse('auth'))
-    uri, state = talent.get_oauth_sess().create_authorization_url(
+    uri, state = talent.OAuth2Session(talent.client_id, talent.client_secret).create_authorization_url(
         talent.authorization_endpoint, response_type='code',
         nonce=time.time(), redirect_uri=redirect_uri
     )

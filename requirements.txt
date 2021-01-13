@@ -6,4 +6,6 @@ redis
 authlib
 python-dotenv
 requests
-
+djangorestframework
+pyyaml
+drf-yasg
