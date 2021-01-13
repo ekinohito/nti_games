@@ -50,9 +50,10 @@ class AuthLoginTalent(APIView):
 
 class AuthCompleteTalent(APIView):
     def get(self, request):
-        # TODO: Add support of denying
         #  GET
         #  '/auth/?error=access_denied&error_description=The+resource+owner+or+authorization+server+denied+the+request'
+        if request.query_params.get('error'):
+            return redirect('index')
 
         token = requests.post(talent.token_endpoint, data={
             'grant_type': 'authorization_code',

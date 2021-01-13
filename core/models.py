@@ -10,8 +10,8 @@ class TalantUser(models.Model):
     steam_id = models.BigIntegerField(default=None, null=True)
 
     dota_result = models.CharField(default=None, null=True, max_length=2500)
-    cs_result = models.CharField(default=None, null=True, max_length=2500)
-
     dota_task = models.CharField(max_length=100, default='')
+
+    cs_result = models.CharField(default=None, null=True, max_length=2500)
     cs_task = models.CharField(max_length=100, default='')
     # talant
