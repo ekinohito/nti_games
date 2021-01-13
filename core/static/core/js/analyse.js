@@ -13,10 +13,8 @@ $('#dota_process').click(function () {
     $.ajax({
         type: "POST",
         url: temp_dota_start_url,
+        data: {'csrfmiddlewaretoken': temp_csrf_token},
         dataType: "json",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
-        },
         success: start_checking_result_dota,
         error: function (rs, e) {
             {
@@ -30,10 +28,8 @@ $('#cs_process').click(function () {
     $.ajax({
         type: "POST",
         url: temp_cs_start_url,
+        data: {'csrfmiddlewaretoken': temp_csrf_token},
         dataType: "json",
-        beforeSend: function (xhr) {
-            xhr.setRequestHeader('X-CSRFToken', $.cookie('csrftoken'))
-        },
         success: start_checking_result_cs,
         error: function (rs, e) {
             {

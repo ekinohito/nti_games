@@ -136,12 +136,12 @@ class LogoutSteam(APIView):
 
 
 def index_page(request):
-    return render(request, 'games/index.html')
+    return render(request, 'core/index.html')
 
 
 @login_required
 def user_page(request):
-    return render(request, 'games/user_page.html', {'user': request.user})
+    return render(request, 'core/user_page.html', {'user': request.user})
 
 
 def register_user(talent_info: talent.TalentInfo, token):
@@ -154,7 +154,7 @@ def register_user(talent_info: talent.TalentInfo, token):
 
 @login_required
 def analyse_page(request):
-    return render(request, 'games/analyse.html', {
+    return render(request, 'core/analyse.html', {
         'user': request.user,
         'dota_result': None if request.user.talantuser.dota_result is None else json.loads(
             request.user.talantuser.dota_result),

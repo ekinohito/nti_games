@@ -35,7 +35,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'games.apps.GamesConfig',
+    'core.apps.GamesConfig',
     'rest_framework',
     'drf_yasg',
 ]
@@ -58,8 +58,8 @@ REST_FRAMEWORK = {
 
 ROOT_URLCONF = 'nti_games.urls'
 
-AUTHENTICATION_BACKENDS = ['games.auth_backend.OAuthBackend']
-LOGIN_URL = '/login/'
+AUTHENTICATION_BACKENDS = ['core.auth_backend.OAuthBackend']
+LOGIN_URL = '/api/auth/login/talent'
 
 TALANT_CLIENT_ID = os.getenv("TALANT_CLIENT_ID")
 TALANT_CLIENT_SECRET = os.getenv("TALANT_CLIENT_SECRET")
@@ -159,7 +159,7 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'games/static'
+    BASE_DIR / 'core/static'
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'

@@ -30,7 +30,7 @@ urlpatterns = [
     path('analyse/status/<str:task_id>/', views.task_status, name='task_status'),
 
     path('api/user', views.CurrentUserView.as_view(), ),
-    path('api/user/games', views.CurrentTalentUserView.as_view(), ),
+    path('api/user/core', views.CurrentTalentUserView.as_view(), ),
 
     path('api/docs', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

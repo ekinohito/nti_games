@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.conf import settings
 
 from analytics.dota.algo_dota import DotaAnalysing
-from analytics.cs_go.algo_cs_go import  CSGOAnalysing
+from analytics.cs_go.algo_cs_go import CSGOAnalysing
 
 
 @shared_task

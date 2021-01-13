@@ -1,4 +1,4 @@
-{% extends 'games/base.html' %}
+{% extends 'core/base.html' %}
 
 {% block content %}
     <h1>Страница для анализа</h1>
@@ -182,6 +182,7 @@
     <script>
         let temp_task_dota_id = "{{ user.talantuser.dota_task }}";
         let temp_task_cs_id = "{{ user.talantuser.cs_task }}";
+        let temp_csrf_token = "{{ csrf_token }}";
         let temp_dota_start_url = "{% url 'analyse-dota' %}";
         let temp_cs_start_url = "{% url 'analyse-cs' %}";
     </script>
@@ -191,10 +192,10 @@
 
 {% block scripts %}
     {% load static %}
-    <script src="{% static 'games/js/analyse.js' %}"></script>
+    <script src="{% static 'core/js/analyse.js' %}"></script>
 {% endblock %}
 
 {% block styles %}
     {% load static %}
-    <link rel="stylesheet" href="{% static 'games/css/analyse.css' %}">
+    <link rel="stylesheet" href="{% static 'core/css/analyse.css' %}">
 {% endblock %}
