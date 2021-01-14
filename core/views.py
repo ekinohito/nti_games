@@ -37,6 +37,22 @@ class CurrentTalentUserView(APIView):
         return Response(serializer.data)
 
 
+class CurrentUserDotaResultView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = serializers.DotaResultSerializer(request.user.talantuser.dota_result)
+        return Response(serializer.data)
+
+
+class CurrentUserCsResultView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = serializers.CsResultSerializer(request.user.talantuser.cs_result)
+        return Response(serializer.data)
+
+
 class AuthLoginTalent(APIView):
     def get(self, request):
         redirect_uri = generate_uri(request, reverse('api_auth_complete_talent'))
@@ -136,62 +152,11 @@ class LogoutSteam(APIView):
         return redirect('user_page')
 
 
-def index_page(request):
-    return render(request, 'core/index.html')
+class CsAnalyseStart(APIView):
+    permission_classes = [IsAuthenticated]
 
-
-@login_required
-def user_page(request):
-    return render(request, 'core/user_page.html', {'user': request.user})
-
-
-def register_user(talent_info: talent.TalentInfo, token):
-    user = User(email=talent_info.email, username=talent_info.email, first_name=talent_info.first_name,
-                last_name=talent_info.last_name)
-    user.save()
-    talent_user = TalantUser(user=user, access_token=json.dumps(token))
-    talent_user.save()
-
-
-@login_required
-def analyse_page(request):
-    return render(request, 'core/analyse.html', {
-        'user': request.user,
-        'dota_result': None if request.user.talantuser.dota_result is None else json.loads(
-            request.user.talantuser.dota_result),
-        'cs_result': None if request.user.talantuser.cs_result is None else json.loads(
-            request.user.talantuser.cs_result),
-    })
-
-
-@login_required
-def dota_analyse(request):
-    ctx = {}
-
-    if request.method == 'POST':
-        user = request.user
-
-        if user.talantuser.steam_id is None:
-            ctx['error'] = "Привяжите Steam к аккаунту"
-            return JsonResponse(ctx)
-        if user.talantuser.dota_task:
-            ctx['error'] = 'Задача уже в очереди'
-            return JsonResponse(ctx)
-
-        task = tasks.dota_count.delay(user.pk)
-        user.talantuser.dota_task = task.id
-        user.talantuser.save()
-
-        ctx['task_id'] = task.id
-
-    return JsonResponse(ctx)
-
-
-@login_required
-def cs_analyse(request):
-    ctx = {}
-
-    if request.method == 'POST':
+    def post(self, request):
+        ctx = {'error': None}
         user = request.user
 
         if user.talantuser.steam_id is None:
@@ -207,21 +172,73 @@ def cs_analyse(request):
 
         ctx['task_id'] = task.id
 
-    return JsonResponse(ctx)
+        return JsonResponse(ctx)
+
+
+class DotaAnalyseStart(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        ctx = {'error': None}
+        user = request.user
+
+        if user.talantuser.steam_id is None:
+            ctx['error'] = "Привяжите Steam к аккаунту"
+            return JsonResponse(ctx)
+        if user.talantuser.dota_task:
+            ctx['error'] = 'Задача уже в очереди'
+            return JsonResponse(ctx)
+
+        task = tasks.dota_count.delay(user.pk)
+        user.talantuser.dota_task = task.id
+        user.talantuser.save()
+
+        ctx['task_id'] = task.id
+
+        return JsonResponse(ctx)
+
+
+class TaskStatus(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        task_id = request.query_params.get('task')
+        ctx = {}
+
+        task = current_app.AsyncResult(task_id)
+        ctx['status'] = task.status  # SUCCESS, FAILURE
+
+        return JsonResponse(ctx)
+
+
+def index_page(request):
+    return render(request, 'core/index.html')
 
 
 @login_required
-def task_status(request, task_id):
-    ctx = {}
-    task = current_app.AsyncResult(task_id)
-    ctx['status'] = task.status
+def user_page(request):
+    return render(request, 'core/user_page.html', {'user': request.user})
 
-    if task.status == 'SUCCESS':
-        ctx['result'] = task.get()
-    if task.status == 'FAILURE':
-        ctx['error'] = str(task.result)
 
-    return JsonResponse(ctx)
+@login_required
+def analyse_page(request):
+    return render(request, 'core/analyse.html', {
+        'user': request.user,
+        'dota_result': None if (request.user.talantuser.dota_result is None
+                                or request.user.talantuser.dota_result.error) else
+        json.loads(request.user.talantuser.dota_result.result),
+        'cs_result': None if (request.user.talantuser.cs_result is None
+                              or request.user.talantuser.cs_result.error) else
+        json.loads(request.user.talantuser.cs_result.result),
+    })
+
+
+def register_user(talent_info: talent.TalentInfo, token):
+    user = User(email=talent_info.email, username=talent_info.email, first_name=talent_info.first_name,
+                last_name=talent_info.last_name)
+    user.save()
+    talent_user = TalantUser(user=user, access_token=json.dumps(token))
+    talent_user.save()
 
 
 def generate_uri(request, rev):

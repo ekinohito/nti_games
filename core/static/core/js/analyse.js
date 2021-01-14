@@ -60,18 +60,32 @@ function check_res(task_id, block) {
     var timerId = setInterval(function () {
         $.ajax({
             type: "GET",
-            url: `/analyse/status/${task_id}`,
+            url: "/api/analyse/status/",
+            data: {'task': task_id},
             dataType: "json",
-            success: function (response) {
-                console.log(response);
-                if (response.status === "SUCCESS") {
-                    update_score(block, response.result);
-                    hide_message(block);
-                    clearInterval(timerId);
-                }
-                if (response.status === "FAILURE") {
-                    check_errors(response, block);
-                    clearInterval(timerId);
+            success: function (response_task) {
+                if (response_task.status !== "PENDING") {
+                    $.ajax({
+                        type: "GET",
+                        url: `/api/analyse/${block}/result`,
+                        dataType: "json",
+                        success: function (response) {
+                            console.log(response);
+                            if (response.error) {
+                                check_errors(response, block);
+                                clearInterval(timerId);
+                            } else {
+                                update_score(block, JSON.parse(response.result));
+                                hide_message(block);
+                                clearInterval(timerId);
+                            }
+                        },
+                        error: function (rs, e) {
+                            {
+                                // alert(rs.responseText);
+                            }
+                        }
+                    });
                 }
             },
             error: function (rs, e) {

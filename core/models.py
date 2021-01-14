@@ -2,6 +2,16 @@ from django.db import models
 from django.contrib.auth.models import User
 
 
+class DotaResult(models.Model):
+    error = models.CharField(max_length=200, default=None, null=True)
+    result = models.CharField(max_length=2500, default=None, null=True)
+
+
+class CsResult(models.Model):
+    error = models.CharField(max_length=200, default=None, null=True)
+    result = models.CharField(max_length=2500, default=None, null=True)
+
+
 class TalantUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     access_token = models.CharField(max_length=2500)
@@ -9,9 +19,9 @@ class TalantUser(models.Model):
     steam_openid = models.CharField(max_length=200, default='')
     steam_id = models.BigIntegerField(default=None, null=True)
 
-    dota_result = models.CharField(default=None, null=True, max_length=2500)
+    dota_result = models.OneToOneField(DotaResult, on_delete=models.CASCADE, default=None, null=True)
     dota_task = models.CharField(max_length=100, default='')
 
-    cs_result = models.CharField(default=None, null=True, max_length=2500)
+    cs_result = models.OneToOneField(CsResult, on_delete=models.CASCADE, default=None, null=True)
     cs_task = models.CharField(max_length=100, default='')
     # talant

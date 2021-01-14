@@ -5,7 +5,7 @@
 
     <div>
         <h2>Dota:</h2>
-        {% if user.talantuser.dota_result %}
+        {% if user.talantuser.dota_result.result %}
             <p id="dota-info" style="display: none"></p>
             <div id="dota-score" class="">
                 <div class="score-line">
@@ -88,7 +88,7 @@
 
     <div>
         <h2>CSGO:</h2>
-        {% if user.talantuser.cs_result %}
+        {% if user.talantuser.cs_result.result %}
             <p id="cs-info" style="display: none"></p>
             <div id="cs-score" class="">
                 <div class="score-line">

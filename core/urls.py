@@ -25,12 +25,14 @@ urlpatterns = [
     path('api/auth/complete/steam/', views.AuthCompleteSteam.as_view(), name='steam_auth'),
     path('api/logout/steam', views.LogoutSteam.as_view(), name='steam_logout'),
 
-    path('analyse/dota/', views.dota_analyse, name='analyse-dota'),
-    path('analyse/cs', views.cs_analyse, name='analyse-cs'),
-    path('analyse/status/<str:task_id>/', views.task_status, name='task_status'),
+    path('api/analyse/dota/start', views.DotaAnalyseStart.as_view(), name='analyse-dota'),
+    path('api/analyse/cs/start', views.CsAnalyseStart.as_view(), name='analyse-cs'),
+    path('api/analyse/dota/result', views.CurrentUserDotaResultView.as_view(), name='analyse_dota_result'),
+    path('api/analyse/cs/result', views.CurrentUserCsResultView.as_view(), name='analyse_cs_result'),
+    path('api/analyse/status/', views.TaskStatus.as_view(), name='task_status'),
 
     path('api/user', views.CurrentUserView.as_view(), ),
-    path('api/user/core', views.CurrentTalentUserView.as_view(), ),
+    path('api/user/games', views.CurrentTalentUserView.as_view(), ),
 
     path('api/docs', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]
