@@ -30,7 +30,7 @@ def dota_count(user_id: int):
     result = DotaResult(error=None, result=json.dumps(res))
     result.save()
 
-    user.talantuser.dota_task = ''
+    user.talantuser.dota_task = None
     user.talantuser.dota_result = result
     user.talantuser.save()
 
@@ -47,7 +47,7 @@ def cs_count(user_id: int):
         result = CsResult(error=e, result=None)
         result.save()
 
-        user.talantuser.cs_task = ''
+        user.talantuser.cs_task = None
         user.talantuser.cs_result = result
         user.talantuser.save()
 
