@@ -83,6 +83,13 @@ CELERY_TASK_SERIALIZER = 'json'
 
 HTTPS_ONLY = int(os.getenv('HTTPS_ONLY'))
 
+AUTHLIB_OAUTH_CLIENTS = {
+    'blizzard': {
+        'client_id': os.getenv('BLIZZARD_CLIENT_ID'),
+        'client_secret': os.getenv('BLIZZARD_CLIENT_SECRET'),
+    }
+}
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',

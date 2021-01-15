@@ -25,6 +25,10 @@ urlpatterns = [
     path('api/auth/complete/steam/', views.AuthCompleteSteam.as_view(), name='steam_auth'),
     path('api/logout/steam', views.LogoutSteam.as_view(), name='steam_logout'),
 
+    path('api/auth/login/blizzard/', views.AuthLoginBlizzard.as_view(), name='blizzard_login'),
+    path('api/auth/complete/blizzard/', views.AuthCompleteBlizzard.as_view(), name='blizzard_auth'),
+    path('api/logout/blizzard', views.LogoutBlizzard.as_view(), name='blizzard_logout'),
+
     path('api/analyse/dota/start', views.DotaAnalyseStart.as_view(), name='analyse-dota'),
     path('api/analyse/cs/start', views.CsAnalyseStart.as_view(), name='analyse-cs'),
     path('api/analyse/dota/result', views.CurrentUserDotaResultView.as_view(), name='analyse_dota_result'),

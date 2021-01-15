@@ -13,4 +13,13 @@
             <a class="btn btn-primary" href="{% url 'steam_login' %}" role="button">Привязать</a>
         {% endif %}
     </div>
+
+    <div>
+        <h2>Blizzard:</h2>
+        {% if user.talantuser.blizzard_battletag %}
+            <p>{{ user.talantuser.blizzard_battletag }}</p><a class="btn btn-outline-primary" href="{% url 'blizzard_logout' %}" role="button">Отвязать</a>
+        {% else %}
+            <a class="btn btn-primary" href="{% url 'blizzard_login' %}" role="button">Привязать</a>
+        {% endif %}
+    </div>
 {% endblock %}
