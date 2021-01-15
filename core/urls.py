@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from .views import api, talent, blizzard, pages, steam
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
 
@@ -13,30 +13,30 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('', views.index_page, name='index'),
-    path('user/', views.user_page, name='user_page'),
-    path('analyse/', views.analyse_page, name='analyse'),
+    path('', pages.index_page, name='index'),
+    path('user/', pages.user_page, name='user_page'),
+    path('analyse/', pages.analyse_page, name='analyse'),
 
-    path('api/auth/login/talent', views.AuthLoginTalent.as_view(), name='api_auth_login_talent'),
-    path('api/auth/complete/talent', views.AuthCompleteTalent.as_view(), name='api_auth_complete_talent'),
-    path('api/logout/talent', views.LogoutTalent.as_view(), name='logout'),
+    path('api/auth/login/talent', talent.AuthLoginTalent.as_view(), name='api_auth_login_talent'),
+    path('api/auth/complete/talent', talent.AuthCompleteTalent.as_view(), name='api_auth_complete_talent'),
+    path('api/logout/talent', talent.LogoutTalent.as_view(), name='logout'),
 
-    path('api/auth/login/steam/', views.AuthLoginSteam.as_view(), name='steam_login'),
-    path('api/auth/complete/steam/', views.AuthCompleteSteam.as_view(), name='steam_auth'),
-    path('api/logout/steam', views.LogoutSteam.as_view(), name='steam_logout'),
+    path('api/auth/login/steam/', steam.AuthLoginSteam.as_view(), name='steam_login'),
+    path('api/auth/complete/steam/', steam.AuthCompleteSteam.as_view(), name='steam_auth'),
+    path('api/logout/steam', steam.LogoutSteam.as_view(), name='steam_logout'),
 
-    path('api/auth/login/blizzard/', views.AuthLoginBlizzard.as_view(), name='blizzard_login'),
-    path('api/auth/complete/blizzard/', views.AuthCompleteBlizzard.as_view(), name='blizzard_auth'),
-    path('api/logout/blizzard', views.LogoutBlizzard.as_view(), name='blizzard_logout'),
+    path('api/auth/login/blizzard/', blizzard.AuthLoginBlizzard.as_view(), name='blizzard_login'),
+    path('api/auth/complete/blizzard/', blizzard.AuthCompleteBlizzard.as_view(), name='blizzard_auth'),
+    path('api/logout/blizzard', blizzard.LogoutBlizzard.as_view(), name='blizzard_logout'),
 
-    path('api/analyse/dota/start', views.DotaAnalyseStart.as_view(), name='analyse-dota'),
-    path('api/analyse/cs/start', views.CsAnalyseStart.as_view(), name='analyse-cs'),
-    path('api/analyse/dota/result', views.CurrentUserDotaResultView.as_view(), name='analyse_dota_result'),
-    path('api/analyse/cs/result', views.CurrentUserCsResultView.as_view(), name='analyse_cs_result'),
-    path('api/analyse/status/', views.TaskStatus.as_view(), name='task_status'),
+    path('api/analyse/dota/start', api.DotaAnalyseStart.as_view(), name='analyse-dota'),
+    path('api/analyse/cs/start', api.CsAnalyseStart.as_view(), name='analyse-cs'),
+    path('api/analyse/dota/result', api.CurrentUserDotaResultView.as_view(), name='analyse_dota_result'),
+    path('api/analyse/cs/result', api.CurrentUserCsResultView.as_view(), name='analyse_cs_result'),
+    path('api/analyse/status/', api.TaskStatus.as_view(), name='task_status'),
 
-    path('api/user', views.CurrentUserView.as_view(), ),
-    path('api/user/games', views.CurrentTalentUserView.as_view(), ),
+    path('api/user', api.CurrentUserView.as_view(), ),
+    path('api/user/games', api.CurrentTalentUserView.as_view(), ),
 
     path('api/docs', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
 ]

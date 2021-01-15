@@ -2,7 +2,7 @@ import json
 
 from celery import shared_task
 from django.contrib.auth.models import User
-from .models import TalantUser, DotaResult, CsResult
+from .models import DotaResult, CsResult
 from django.conf import settings
 
 from analytics.dota.algo_dota import DotaAnalysing
@@ -18,20 +18,20 @@ def dota_count(user_id: int):
     try:
         res = dota.start()
     except Exception as e:
-        result = DotaResult(error=e, result=None)
-        result.save()
+        user.talantuser.dota_task = None
+        user.talantuser.dota_result.error = e
+        user.talantuser.dota_result.result = None
 
-        user.talantuser.dota_task = ''
-        user.talantuser.dota_result = result
+        user.talantuser.dota_result.save()
         user.talantuser.save()
 
         raise e
 
-    result = DotaResult(error=None, result=json.dumps(res))
-    result.save()
-
     user.talantuser.dota_task = None
-    user.talantuser.dota_result = result
+    user.talantuser.dota_result.error = None
+    user.talantuser.dota_result.result = res
+
+    user.talantuser.dota_result.save()
     user.talantuser.save()
 
 
@@ -44,18 +44,18 @@ def cs_count(user_id: int):
     try:
         res = cs.start()
     except Exception as e:
-        result = CsResult(error=e, result=None)
-        result.save()
-
         user.talantuser.cs_task = None
-        user.talantuser.cs_result = result
+        user.talantuser.cs_result.result = None
+        user.talantuser.cs_result.error = e
+
+        user.talantuser.cs_result.save()
         user.talantuser.save()
 
         raise e
 
-    result = CsResult(error=None, result=json.dumps(res))
-    result.save()
-
     user.talantuser.cs_task = ''
-    user.talantuser.cs_result = result
+    user.talantuser.cs_result.result = res
+    user.talantuser.cs_result.error = None
+
+    user.talantuser.cs_result.save()
     user.talantuser.save()
