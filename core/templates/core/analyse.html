@@ -1,0 +1,209 @@
+{% extends 'core/base.html' %}
+
+{% block content %}
+    <h1>Страница для анализа</h1>
+
+    <div>
+        <h2>Dota:</h2>
+        {% if user.talantuser.dota_result.result %}
+            <p id="dota-info" style="display: none"></p>
+            <div id="dota-score" class="">
+                <div class="score-line">
+                    <p>Общий score: </p>
+                    <p id="dota-score-score">{{ dota_result.score }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p id="dota-text_score-score">{{ dota_result.text_score }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p class="additional-info">Дополнительная информация:</p>
+                </div>
+
+                <div class="score-line">
+                    <p>Роль: </p>
+                    <p id="dota-role-score">{{ dota_result.role }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p id="dota-comparing_skill-score">{{ dota_result.comparing_skill }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p>Средний процент полезности принесенный команде: </p>
+                    <p id="dota-benefit-score">{{ dota_result.benefit }}</p>
+                    <p>%</p>
+                </div>
+
+                <div class="score-line">
+                    <p>Процент участия в командных убийствах: </p>
+                    <p id="dota-frequency_fight-score">{{ dota_result.frequency_fight }}</p>
+                    <p>%</p>
+                </div>
+            </div>
+        {% else %}
+            <p id="dota-info">Не проанализировано</p>
+            <div id="dota-score" class="" style="display: none">
+                <div class="score-line">
+                    <p>Общий score: </p>
+                    <p id="dota-score-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p id="dota-text_score-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p class="additional-info">Дополнительная информация:</p>
+                </div>
+
+                <div class="score-line">
+                    <p>Роль: </p>
+                    <p id="dota-role-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p id="dota-comparing_skill-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p>Средний процент полезности принесенный команде: </p>
+                    <p id="dota-benefit-score"></p>
+                    <p>%</p>
+                </div>
+
+                <div class="score-line">
+                    <p>Процент участия в командных убийствах: </p>
+                    <p id="dota-frequency_fight-score"></p>
+                    <p>%</p>
+                </div>
+            </div>
+        {% endif %}
+
+
+        <input type="button" id="dota_process" class="btn btn-primary score-button" value="Начать анализ"/>
+    </div>
+
+
+    <div>
+        <h2>CSGO:</h2>
+        {% if user.talantuser.cs_result.result %}
+            <p id="cs-info" style="display: none"></p>
+            <div id="cs-score" class="">
+                <div class="score-line">
+                    <p>Общий score: </p>
+                    <p id="cs-score-score">{{ cs_result.score }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p id="cs-text_score-score">{{ cs_result.text_score }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p class="additional-info">Дополнительная информация:</p>
+                </div>
+
+
+                <div class="score-line">
+                    <p>Отношение убийств к смертям: </p>
+                    <p id="cs-kd-score">{{ cs_result.kd }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p>Среднее скор в игре: </p>
+                    <p id="cs-avg_cs-score">{{ cs_result.avg_cs }}</p>
+                </div>
+
+                <div class="score-line">
+                    <p>В среднем, каждые
+                    <p id="cs-avg_plant_defuse-score">{{ cs_result.avg_plant_defuse }}</p> раундов ты ставил или
+                    обезвреживал бомбу</p>
+                </div>
+
+                <div class="score-line">
+                    <p>В среднем, каждые
+                    <p id="cs-avg_give_weapon-score">{{ cs_result.avg_give_weapon }}</p> раундов ты отдавал союзнику
+                    оружие</p>
+                </div>
+
+                <div class="score-line">
+                    <p>В среднем, каждые
+                    <p id="cs-avg_mvp-score">{{ cs_result.avg_mvp }}</p> раунда ты MVP</p>
+                </div>
+            </div>
+        {% else %}
+            <p id="cs-info">Не проанализировано</p>
+            <div id="cs-score" class="" style="display: none">
+                <div class="score-line">
+                    <p>Общий score: </p>
+                    <p id="cs-score-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p id="cs-text_score-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p class="additional-info">Дополнительная информация:</p>
+                </div>
+
+                <div class="score-line">
+                    <p>Отношение убийств к смертям: </p>
+                    <p id="cs-kd-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p>Среднее скор в игре: </p>
+                    <p id="cs-avg_cs-score"></p>
+                </div>
+
+                <div class="score-line">
+                    <p>В среднем, каждые
+                    <p id="cs-avg_plant_defuse-score"></p> раундов ты ставил или обезвреживал бомбу</p>
+                </div>
+
+                <div class="score-line">
+                    <p>В среднем, каждые
+                    <p id="cs-avg_give_weapon-score"></p> раундов ты отдавал союзнику оружие</p>
+                </div>
+
+                <div class="score-line">
+                    <p>В среднем, каждые
+                    <p id="cs-avg_mvp-score"></p> раунда ты MVP</p>
+                </div>
+            </div>
+        {% endif %}
+
+
+        <input type="button" id="cs_process" class="btn btn-primary score-button" value="Начать анализ"/>
+    </div>
+
+    <script>
+        {% if user.talantuser.dota_task %}
+            let temp_task_dota_id = "{{ user.talantuser.dota_task }}";
+        {% else %}
+            let temp_task_dota_id = null;
+        {% endif %}
+        {% if user.talantuser.cs_task %}
+            let temp_task_cs_id = "{{ user.talantuser.cs_task }}";
+        {% else %}
+            let temp_task_cs_id = null;
+        {% endif %}
+        let temp_csrf_token = "{{ csrf_token }}";
+        let temp_dota_start_url = "{% url 'analyse-dota' %}";
+        let temp_cs_start_url = "{% url 'analyse-cs' %}";
+    </script>
+{% endblock %}
+
+
+
+{% block scripts %}
+    {% load static %}
+    <script src="{% static 'core/js/analyse.js' %}"></script>
+{% endblock %}
+
+{% block styles %}
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'core/css/analyse.css' %}">
+{% endblock %}

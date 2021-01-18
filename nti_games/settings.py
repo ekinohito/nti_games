@@ -35,7 +35,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'games.apps.GamesConfig',
+    'core.apps.GamesConfig',
+    'rest_framework',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
@@ -48,32 +50,16 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
+
 ROOT_URLCONF = 'nti_games.urls'
 
-AUTHENTICATION_BACKENDS = ['games.auth_backend.OAuthBackend']
-LOGIN_URL = '/login/'
-
-TALANT_CLIENT_ID = os.getenv("TALANT_CLIENT_ID")
-TALANT_CLIENT_SECRET = os.getenv("TALANT_CLIENT_SECRET")
-STEAM_API_KEY = os.getenv("STEAM_API_KEY")
-
-OPEN_ID_NS = 'http://specs.openid.net/auth/2.0'
-OPEN_ID_CLAIMED_ID = 'http://specs.openid.net/auth/2.0/identifier_select'
-OPEN_ID_IDENTITY = 'http://specs.openid.net/auth/2.0/identifier_select'
-FORMAT_STEAM_AUTH_URL = 'https://steamcommunity.com/openid/login?{}'
-
-if int(os.getenv('DOCKER')):
-    CELERY_BROKER_URL = 'redis://redis:6379'
-    CELERY_RESULT_BACKEND = 'redis://redis:6379'
-else:
-    CELERY_BROKER_URL = 'redis://localhost:6379'
-    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
-
-CELERY_ACCEPT_CONTENT = ['application/json']
-CELERY_RESULT_SERIALIZER = 'json'
-CELERY_TASK_SERIALIZER = 'json'
-
-HTTPS_ONLY = int(os.getenv('HTTPS_ONLY'))
+AUTHENTICATION_BACKENDS = ['core.auth_backend.OAuthBackend']
+LOGIN_URL = '/api/auth/login/talent'
 
 TEMPLATES = [
     {
@@ -106,12 +92,12 @@ if DEBUG:
 else:
     DATABASES = {
         "default": {
-            "ENGINE": os.environ.get("SQL_ENGINE", "django.db.backends.sqlite3"),
-            "NAME": os.environ.get("SQL_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
-            "USER": os.environ.get("SQL_USER", "user"),
-            "PASSWORD": os.environ.get("SQL_PASSWORD", "password"),
-            "HOST": os.environ.get("SQL_HOST", "localhost"),
-            "PORT": os.environ.get("SQL_PORT", "5432"),
+            "ENGINE": os.environ.get("SQL_ENGINE"),
+            "NAME": os.environ.get("SQL_DATABASE"),
+            "USER": os.environ.get("SQL_USER"),
+            "PASSWORD": os.environ.get("SQL_PASSWORD"),
+            "HOST": os.environ.get("SQL_HOST"),
+            "PORT": os.environ.get("SQL_PORT"),
         }
     }
 
@@ -151,7 +137,51 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    BASE_DIR / 'games/static'
+    BASE_DIR / 'core/static'
 ]
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+
+# ============================= CELERY =============================
+
+if int(os.getenv('DOCKER')):
+    CELERY_BROKER_URL = 'redis://redis:6379'
+    CELERY_RESULT_BACKEND = 'redis://redis:6379'
+else:
+    CELERY_BROKER_URL = 'redis://localhost:6379'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379'
+
+CELERY_ACCEPT_CONTENT = ['application/json']
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_SERIALIZER = 'json'
+
+# ========================== API SETTINGS ==========================
+
+HTTPS_ONLY = int(os.getenv('HTTPS_ONLY'))
+
+# Talent
+TALENT_CLIENT_ID = os.getenv("TALENT_CLIENT_ID")
+TALENT_CLIENT_SECRET = os.getenv("TALENT_CLIENT_SECRET")
+TALENT_AUTHORIZATION_ENDPOINT = 'https://talent.kruzhok.org/oauth/authorize/'
+TALENT_TOKEN_ENDPOINT = 'https://talent.kruzhok.org/api/oauth/issue-token/'
+
+
+# Steam
+OPEN_ID_NS = 'http://specs.openid.net/auth/2.0'
+OPEN_ID_CLAIMED_ID = 'http://specs.openid.net/auth/2.0/identifier_select'
+OPEN_ID_IDENTITY = 'http://specs.openid.net/auth/2.0/identifier_select'
+FORMAT_STEAM_AUTH_URL = 'https://steamcommunity.com/openid/login?{}'
+
+STEAM_API_KEY = os.getenv("STEAM_API_KEY")
+
+# Blizzard
+AUTHLIB_OAUTH_CLIENTS = {
+    'blizzard': {
+        'client_id': os.getenv('BLIZZARD_CLIENT_ID'),
+        'client_secret': os.getenv('BLIZZARD_CLIENT_SECRET'),
+    }
+}
+BLIZZARD_CONF_URL = 'https://eu.battle.net/oauth/.well-known/openid-configuration'
+BLIZZARD_API_USERINFO_URL = 'https://eu.battle.net/oauth/userinfo'
+
