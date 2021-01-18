@@ -16,10 +16,9 @@ from dataclasses import dataclass
 from django.conf import settings
 from authlib.integrations.requests_client import OAuth2Session
 
-client_id = settings.TALANT_CLIENT_ID
-client_secret = settings.TALANT_CLIENT_SECRET
-authorization_endpoint = 'https://talent.kruzhok.org/oauth/authorize/'
-token_endpoint = 'https://talent.kruzhok.org/api/oauth/issue-token/'
+client_id = settings.TALENT_CLIENT_ID
+client_secret = settings.TALENT_CLIENT_SECRET
+token_endpoint = settings.TALENT_TOKEN_ENDPOINT
 
 
 @dataclass
@@ -56,7 +55,7 @@ class AuthLoginTalent(APIView):
         redirect_uri = generate_uri(request, reverse('api_auth_complete_talent'))
 
         uri, state = OAuth2Session(client_id, client_secret).create_authorization_url(
-            authorization_endpoint, response_type='code',
+            settings.TALENT_AUTHORIZATION_ENDPOINT, response_type='code',
             nonce=time.time(), redirect_uri=redirect_uri
         )
         return redirect(uri)
@@ -69,7 +68,7 @@ class AuthCompleteTalent(APIView):
         if request.query_params.get('error'):
             return redirect('index')
 
-        token = requests.post(token_endpoint, data={
+        token = requests.post(settings.TALENT_TOKEN_ENDPOINT, data={
             'grant_type': 'authorization_code',
             'scope': 'openid',
             'nonce': time.time(),

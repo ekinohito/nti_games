@@ -5,19 +5,8 @@ from django.urls import reverse
 from django.conf import settings
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from authlib.integrations.django_client import OAuth
 
 from core.views.utils import generate_uri
-
-BLIZZARD_CONF_URL = 'https://eu.battle.net/oauth/.well-known/openid-configuration'
-oauth = OAuth()
-oauth.register(
-    name='blizzard',
-    server_metadata_url=BLIZZARD_CONF_URL,
-    client_kwargs={
-        'scope': ''
-    }
-)
 
 
 class AuthLoginSteam(APIView):

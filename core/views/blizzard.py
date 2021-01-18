@@ -5,14 +5,14 @@ from django.urls import reverse
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from authlib.integrations.django_client import OAuth
+from django.conf import settings
 
 from core.views.utils import generate_uri
 
-BLIZZARD_CONF_URL = 'https://eu.battle.net/oauth/.well-known/openid-configuration'
 oauth = OAuth()
 oauth.register(
     name='blizzard',
-    server_metadata_url=BLIZZARD_CONF_URL,
+    server_metadata_url=settings.BLIZZARD_CONF_URL,
     client_kwargs={
         'scope': ''
     }
@@ -32,8 +32,7 @@ class AuthCompleteBlizzard(APIView):
 
     def get(self, request):
         token = oauth.blizzard.authorize_access_token(request)
-        user_info = oauth.blizzard.request('get', 'https://eu.battle.net/oauth/userinfo',
-                                           token=token).json()  # sub, id, battletag
+        user_info = oauth.blizzard.request('get', settings.BLIZZARD_API_USERINFO_URL, token=token).json()
         request.user.talantuser.blizzard_access_token = json.dumps(token)
         request.user.talantuser.blizzard_battletag = user_info['battletag']
         request.user.talantuser.blizzard_id = user_info['id']
