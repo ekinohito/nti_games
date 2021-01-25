@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: 'NTI-Games API'
-  version: '1.0.1'
+  version: '1.0.2'
 paths:
   /api/auth/login/talent/:
     get:
@@ -10,6 +10,8 @@ paths:
       responses:
         '200':
           description: No response body
+      security:
+      - cookieAuth: []
       tags:
       - auth
   /api/logout/talent/:
@@ -19,6 +21,8 @@ paths:
       responses:
         '200':
           description: No response body
+      security:
+      - cookieAuth: []
       tags:
       - auth
   /api/auth/login/steam/:
@@ -28,6 +32,8 @@ paths:
       responses:
         '200':
           description: No response body
+      security:
+      - cookieAuth: []
       tags:
       - auth
   /api/logout/steam/:
@@ -37,6 +43,8 @@ paths:
       responses:
         '200':
           description: No response body
+      security:
+      - cookieAuth: []
       tags:
       - auth
   /api/auth/login/blizzard/:
@@ -46,6 +54,8 @@ paths:
       responses:
         '200':
           description: No response body
+      security:
+      - cookieAuth: []
       tags:
       - auth
   /api/logout/blizzard/:
@@ -55,6 +65,8 @@ paths:
       responses:
         '200':
           description: No response body
+      security:
+      - cookieAuth: []
       tags:
       - auth
   /api/analyse/dota/result/:
@@ -70,6 +82,8 @@ paths:
                 type: array
                 items: {}
           description: ''
+      security:
+      - cookieAuth: []
       tags:
       - analyse
   /api/analyse/cs/result/:
@@ -85,6 +99,8 @@ paths:
                 type: array
                 items: {}
           description: ''
+      security:
+      - cookieAuth: []
       tags:
       - analyse
   /api/analyse/status/:
@@ -100,6 +116,8 @@ paths:
                 type: array
                 items: {}
           description: ''
+      security:
+      - cookieAuth: []
       tags:
       - analyse
   /api/user/:
@@ -115,6 +133,8 @@ paths:
                 type: array
                 items: {}
           description: ''
+      security:
+      - cookieAuth: []
       tags:
       - user
   /api/user/games/:
@@ -130,6 +150,8 @@ paths:
                 type: array
                 items: {}
           description: ''
+      security:
+      - cookieAuth: []
       tags:
       - user
   /api/analyse/dota/start/:
@@ -151,6 +173,8 @@ paths:
             application/json:
               schema: {}
           description: ''
+      security:
+      - cookieAuth: []
       tags:
       - analyse
   /api/analyse/cs/start/:
@@ -172,5 +196,13 @@ paths:
             application/json:
               schema: {}
           description: ''
+      security:
+      - cookieAuth: []
       tags:
       - analyse
+components:
+  securitySchemes:
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid
