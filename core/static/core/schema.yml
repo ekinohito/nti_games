@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: 'NTI-Games API'
-  version: '1.0.2'
+  version: '1.0.3'
 paths:
   /api/auth/login/talent/:
     get:
@@ -72,15 +72,13 @@ paths:
   /api/analyse/dota/result/:
     get:
       operationId: dota_result
-      description: ''
-      parameters: []
+      description: 'Результат анализа для Dota'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
+                $ref: '#/components/schemas/DotaResult'
           description: ''
       security:
       - cookieAuth: []
@@ -89,15 +87,13 @@ paths:
   /api/analyse/cs/result/:
     get:
       operationId: cs_result
-      description: ''
-      parameters: []
+      description: 'Результат анализа для Cs'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
+                $ref: '#/components/schemas/CsResult'
           description: ''
       security:
       - cookieAuth: []
@@ -123,15 +119,13 @@ paths:
   /api/user/:
     get:
       operationId: user
-      description: ''
-      parameters: []
+      description: 'Данные авторизованного пользователя'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
+                $ref: '#/components/schemas/User'
           description: ''
       security:
       - cookieAuth: []
@@ -140,15 +134,13 @@ paths:
   /api/user/games/:
     get:
       operationId: user_games
-      description: ''
-      parameters: []
+      description: 'Дополнительные данные авторизованного пользователя'
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
+                $ref: '#/components/schemas/UserGames'
           description: ''
       security:
       - cookieAuth: []
@@ -201,6 +193,54 @@ paths:
       tags:
       - analyse
 components:
+  schemas:
+    User:
+      type: object
+      description: Данные пользователя
+      properties:
+        id:
+          type: integer
+        email:
+          type: string
+        first_name:
+          type: string
+        last_name:
+          type: string
+    UserGames:
+      type: object
+      description: Дополнительная информация пользователя
+      properties:
+        pk:
+          type: integer
+        steam_id:
+          type: integer
+          nullable: true
+        blizzard_id:
+          type: integer
+          nullable: true
+        blizzard_battletag:
+          type: string
+          nullable: true
+        dota_result:
+          allOf:
+          - $ref: '#/components/schemas/DotaResult'
+          - nullable: true
+        cs_result:
+          allOf:
+          - $ref: '#/components/schemas/CsResult'
+          - nullable: true
+        dota_task:
+          type: string
+          nullable: true
+        cs_task:
+          type: string
+          nullable: true
+    DotaResult:
+      description: Work in progress
+      type: object
+    CsResult:
+      description: Work in progress
+      type: object
   securitySchemes:
     cookieAuth:
       type: apiKey
