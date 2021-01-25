@@ -1,9 +1,16 @@
 import requests
 from analytics.cs_go.error import CSGOError
+from core.models import CsResult
 
+TEMPLATE = "Ваш KD {} \n" \
+           "Ваш средний скор в игре: {} \n" \
+           "В среднем, каждые {} раундов вы ставите бомбу \n" \
+           "В среднем, каждые {} раундов вы отдаете собзнику оружие \n "\
+           "В среднем, каждые {} раундов вы MVP"
 
 class CSGOAnalysing:
     def __init__(self, api_key, steam_id):
+        self.db = CsResult()
         self.api_key = api_key
         self.steam_id = steam_id
         self.data = ""
@@ -11,7 +18,15 @@ class CSGOAnalysing:
     def start(self):
         json_data = self.get_data()
         self.parse_data(json_data)
-        return self.get_score()
+        info = self.get_score()
+        self.db.result = False
+        self.db.result_num = info["score"]
+        self.db.result_big_str = TEMPLATE.format(info["kd"], info["avg_cs"],
+                                                 info["avg_plant_defuse"],
+                                                 info["avg_give_weapon"], info["avg_mvp"])
+        self.db.result_str = info["text_score"]
+        self.db.result_json = info
+        self.db.save()
 
     def parse_data(self, json_file):
         arr = ['total_contribution_score',
@@ -103,6 +118,9 @@ class CSGOAnalysing:
                            f"key={self.api_key}&steamid={self.steam_id}")
 
         if req.status_code != 200:
+            self.db.result = False
+            self.db.error = "У вас закрытый аккаунт или вы не играете в CSGO"
+            self.db.save()
             raise CSGOError("У вас закрытый аккаунт или вы не играете в CSGO")
 
         return req.json()

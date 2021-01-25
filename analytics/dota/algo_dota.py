@@ -2,11 +2,17 @@ import requests
 from time import sleep
 from analytics.dota.counter import Counter
 from analytics.dota.error import DotaError
-LIMIT = 20
+from core.models import DotaResult
 
+LIMIT = 20
+TEMPLATE = "Вы играете на {} роли \n" \
+           "{} \n" \
+           "Вы стараетесь в играх на {} от возможных 100% \n" \
+           "Процент участия в командных убийствах равен {}"
 
 class DotaAnalysing:
     def __init__(self, steam_id):
+        self.db = DotaResult()
         self.index = 0
         self.side = ""
         self.party = 0
@@ -18,7 +24,16 @@ class DotaAnalysing:
 
     def start(self, flag=True):
         self.get_games_id(flag)
-        return self.analysis()
+        info = self.analysis()
+
+        self.db.result = True
+        self.db.result_num = info["score"]
+        self.db.result_str = info["text_score"]
+        self.db.result_big_str = TEMPLATE.format(info["role"], info["comparing_skill"],
+                                            info["benefit"], info["freequence_fight"])
+        self.db.result_json = info
+        self.db.save()
+
 
     def analysis(self):
         party = Counter()
@@ -54,6 +69,9 @@ class DotaAnalysing:
 
         print(solo.num, party.num)
         if solo.num == 0 and party.num == 0:
+            self.db.error = "Матчи были сыграны давно, невозможно сделать подробный анализ"
+            self.db.result = False
+            self.db.save()
             raise DotaError("Матчи были сыграны давно, невозможно сделать подробный анализ")
 
         party_pk = party.count_pk()
@@ -141,6 +159,9 @@ class DotaAnalysing:
                 party_id = players[i]["party_id"]
 
                 if "lane_role" not in players[i]:
+                    self.db.error = "Недостаточно наиграно матчей в этом патче"
+                    self.db.result = False
+                    self.db.save()
                     raise DotaError("Недостаточно наиграно матчей в этом патче")
 
                 lane = players[i]["lane_role"]
@@ -170,8 +191,14 @@ class DotaAnalysing:
         self.refresh_players()
         games = self.get_response_players("matches", limit=LIMIT, game_mode=22)
         if len(games) == 0:
+            self.db.error = "Вы не играете в доту или закрыт аккаунт"
+            self.db.result = False
+            self.db.save()
             raise DotaError("Вы не играете в доту или закрыт аккаунт")
         elif len(games) < LIMIT:
+            self.db.error = "Недостаточно игр"
+            self.db.result = False
+            self.db.save()
             raise DotaError("Недостаточно игр")
 
         for x in range(LIMIT):
