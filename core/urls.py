@@ -1,16 +1,7 @@
 from django.urls import path
-from .views import api, talent, blizzard, pages, steam
-from drf_yasg.views import get_schema_view
-from drf_yasg import openapi
+from .views import api, talent, blizzard, pages, steam, api_docs
+from django.views.generic import TemplateView
 
-schema_view = get_schema_view(
-    openapi.Info(
-        title="Nti Games",
-        default_version='v1',
-        description="Some description",
-    ),
-    public=True,
-)
 
 urlpatterns = [
     path('', pages.index_page, name='index'),
@@ -38,5 +29,8 @@ urlpatterns = [
     path('api/user/', api.CurrentUserView.as_view(), ),
     path('api/user/games/', api.CurrentTalentUserView.as_view(), ),
 
-    path('api/docs/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+    path('api/docs/schema/', api_docs.schema_view, name='schema_url'),
+    path('api/docs/', TemplateView.as_view(
+        template_name='core/redoc.html',
+    ), name='redoc'),
 ]
