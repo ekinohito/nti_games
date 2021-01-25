@@ -1,146 +1,65 @@
 openapi: 3.0.2
 info:
-  title: ''
-  version: ''
+  title: 'NTI-Games API'
+  version: '1.0.1'
 paths:
   /api/auth/login/talent/:
     get:
-      operationId: listAuthLoginTalents
-      description: ''
-      parameters: []
+      operationId: login_talent
+      description: 'Авторизация через talent.kruzhok.org'
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
+          description: No response body
       tags:
-      - api
-  /api/auth/complete/talent/:
-    get:
-      operationId: listAuthCompleteTalents
-      description: ''
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
-      tags:
-      - api
+      - auth
   /api/logout/talent/:
     get:
-      operationId: listLogoutTalents
-      description: ''
-      parameters: []
+      operationId: logout_talent
+      description: 'Выход из учетной записи'
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
+          description: No response body
       tags:
-      - api
+      - auth
   /api/auth/login/steam/:
     get:
-      operationId: listAuthLoginSteams
-      description: ''
-      parameters: []
+      operationId: login_steam
+      description: 'Привязка Steam к учетной записи'
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
+          description: No response body
       tags:
-      - api
-  /api/auth/complete/steam/:
-    get:
-      operationId: listAuthCompleteSteams
-      description: ''
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
-      tags:
-      - api
+      - auth
   /api/logout/steam/:
     get:
-      operationId: listLogoutSteams
-      description: ''
-      parameters: []
+      operationId: logout_steam
+      description: 'Отвязка Steam от учетной записи'
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
+          description: No response body
       tags:
-      - api
+      - auth
   /api/auth/login/blizzard/:
     get:
-      operationId: listAuthLoginBlizzards
-      description: ''
-      parameters: []
+      operationId: login_blizzard
+      description: 'Привязка Blizzard к учетной записи'
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
+          description: No response body
       tags:
-      - api
-  /api/auth/complete/blizzard/:
-    get:
-      operationId: listAuthCompleteBlizzards
-      description: ''
-      parameters: []
-      responses:
-        '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
-      tags:
-      - api
+      - auth
   /api/logout/blizzard/:
     get:
-      operationId: listLogoutBlizzards
-      description: ''
-      parameters: []
+      operationId: logout_blizzard
+      description: 'Отвязка Blizzard от учетной записи'
       responses:
         '200':
-          content:
-            application/json:
-              schema:
-                type: array
-                items: {}
-          description: ''
+          description: No response body
       tags:
-      - api
+      - auth
   /api/analyse/dota/result/:
     get:
-      operationId: listCurrentUserDotaResults
+      operationId: dota_result
       description: ''
       parameters: []
       responses:
@@ -152,10 +71,10 @@ paths:
                 items: {}
           description: ''
       tags:
-      - api
+      - analyse
   /api/analyse/cs/result/:
     get:
-      operationId: listCurrentUserCsResults
+      operationId: cs_result
       description: ''
       parameters: []
       responses:
@@ -167,10 +86,10 @@ paths:
                 items: {}
           description: ''
       tags:
-      - api
+      - analyse
   /api/analyse/status/:
     get:
-      operationId: listTaskStatus
+      operationId: task_status
       description: ''
       parameters: []
       responses:
@@ -182,10 +101,10 @@ paths:
                 items: {}
           description: ''
       tags:
-      - api
+      - analyse
   /api/user/:
     get:
-      operationId: listCurrentUsers
+      operationId: user
       description: ''
       parameters: []
       responses:
@@ -197,10 +116,10 @@ paths:
                 items: {}
           description: ''
       tags:
-      - api
+      - user
   /api/user/games/:
     get:
-      operationId: listCurrentTalentUsers
+      operationId: user_games
       description: ''
       parameters: []
       responses:
@@ -212,10 +131,10 @@ paths:
                 items: {}
           description: ''
       tags:
-      - api
+      - user
   /api/analyse/dota/start/:
     post:
-      operationId: createDotaAnalyseStart
+      operationId: dota_start
       description: ''
       parameters: []
       requestBody:
@@ -233,10 +152,10 @@ paths:
               schema: {}
           description: ''
       tags:
-      - api
+      - analyse
   /api/analyse/cs/start/:
     post:
-      operationId: createCsAnalyseStart
+      operationId: cs_start
       description: ''
       parameters: []
       requestBody:
@@ -254,4 +173,4 @@ paths:
               schema: {}
           description: ''
       tags:
-      - api
+      - analyse
