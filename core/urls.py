@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import api, talent, blizzard, pages, steam, utils
+from .views import api, talent, blizzard, pages, steam, api_docs
 from django.views.generic import TemplateView
 
 
@@ -29,7 +29,7 @@ urlpatterns = [
     path('api/user/', api.CurrentUserView.as_view(), ),
     path('api/user/games/', api.CurrentTalentUserView.as_view(), ),
 
-    path('api/docs/schema/', utils.schema_view, name='schema_url'),
+    path('api/docs/schema/', api_docs.schema_view, name='schema_url'),
     path('api/docs/', TemplateView.as_view(
         template_name='core/redoc.html',
     ), name='redoc'),
