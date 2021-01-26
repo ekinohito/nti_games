@@ -8,7 +8,7 @@ paths:
       operationId: login_talent
       description: 'Авторизация через talent.kruzhok.org'
       responses:
-        '200':
+        '302':
           description: 'No response body'
       security:
       - cookieAuth: []
@@ -30,7 +30,7 @@ paths:
       operationId: login_steam
       description: 'Привязка Steam к учетной записи'
       responses:
-        '200':
+        '302':
           description: 'No response body'
       security:
       - cookieAuth: []
@@ -52,7 +52,7 @@ paths:
       operationId: login_blizzard
       description: 'Привязка Blizzard к учетной записи'
       responses:
-        '200':
+        '302':
           description: 'No response body'
       security:
       - cookieAuth: []

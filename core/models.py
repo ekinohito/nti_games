@@ -29,7 +29,6 @@ class OverwatchResult(models.Model):
     result_json = models.CharField(max_length=5000, default=None, null=True)
 
 
-
 class TalantUser(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     access_token = models.CharField(max_length=2500)
