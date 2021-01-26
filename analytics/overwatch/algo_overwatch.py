@@ -1,7 +1,7 @@
 import copy
 import json
 import requests
-# from dota import helper
+from analytics.overwatch import helper
 from analytics.overwatch.error import OverwatchError
 from core.models import OverwatchResult
 
@@ -29,8 +29,8 @@ class Overwatch:
 
         with open('avg_over_responce2.json', 'r') as r:
             self.avg_responce = json.loads(r.read())
-        # self.role_coefs = helper.over_role_coefs
-        # self.hero_roles = helper.over_hero_roles
+        self.role_coefs = helper.over_role_coefs
+        self.hero_roles = helper.over_hero_roles
 
     def get_pro_stats(self):
         with open('1.txt', 'r') as r:
