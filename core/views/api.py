@@ -39,6 +39,14 @@ class CurrentUserCsResultView(APIView):
         return Response(serializer.data)
 
 
+class CurrentUserOverwatchResultView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        serializer = serializers.OverwatchResultSerializer(request.user.talantuser.overwatch_result)
+        return Response(serializer.data)
+
+
 class CsAnalyseStart(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -78,6 +86,29 @@ class DotaAnalyseStart(APIView):
 
         task = tasks.dota_count.delay(user.pk)
         user.talantuser.dota_task = task.id
+        user.talantuser.save()
+
+        ctx['task_id'] = task.id
+
+        return Response(ctx)
+
+
+class OverwatchAnalyseStart(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        ctx = {'error': None, 'task_id': None}
+        user = request.user
+
+        if user.talantuser.blizzard_battletag is None:
+            ctx['error'] = "Привяжите BattleNet к аккаунту"
+            return Response(ctx)
+        if user.talantuser.overwatch_task:
+            ctx['error'] = 'Задача уже в очереди'
+            return Response(ctx)
+
+        task = tasks.overwatch_count.delay(user.pk)
+        user.talantuser.overwatch_task = task.id
         user.talantuser.save()
 
         ctx['task_id'] = task.id

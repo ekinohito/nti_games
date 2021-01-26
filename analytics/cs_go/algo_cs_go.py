@@ -1,3 +1,5 @@
+import json
+
 import requests
 from analytics.cs_go.error import CSGOError
 from core.models import CsResult
@@ -5,12 +7,13 @@ from core.models import CsResult
 TEMPLATE = "Ваш KD {} \n" \
            "Ваш средний скор в игре: {} \n" \
            "В среднем, каждые {} раундов вы ставите бомбу \n" \
-           "В среднем, каждые {} раундов вы отдаете собзнику оружие \n "\
+           "В среднем, каждые {} раундов вы отдаете собзнику оружие \n " \
            "В среднем, каждые {} раундов вы MVP"
 
+
 class CSGOAnalysing:
-    def __init__(self, api_key, steam_id):
-        self.db = CsResult()
+    def __init__(self, api_key, steam_id, db_entry: CsResult):
+        self.db = db_entry
         self.api_key = api_key
         self.steam_id = steam_id
         self.data = ""
@@ -19,13 +22,13 @@ class CSGOAnalysing:
         json_data = self.get_data()
         self.parse_data(json_data)
         info = self.get_score()
-        self.db.result = False
+        self.db.result = True
         self.db.result_num = info["score"]
         self.db.result_big_str = TEMPLATE.format(info["kd"], info["avg_cs"],
                                                  info["avg_plant_defuse"],
                                                  info["avg_give_weapon"], info["avg_mvp"])
         self.db.result_str = info["text_score"]
-        self.db.result_json = info
+        self.db.result_json = json.dumps(info)
         self.db.save()
 
     def parse_data(self, json_file):
@@ -55,7 +58,7 @@ class CSGOAnalysing:
     def get_score(self):
         dct = self.get_score_total()
         dct["score"] = round(0.70 * dct["score"] + 0.30 * self.get_score_last() \
-            if self.get_score_last() != 0 else dct["score"], 2)
+                                 if self.get_score_last() != 0 else dct["score"], 2)
         return dct
 
     def get_score_last(self):
@@ -93,7 +96,7 @@ class CSGOAnalysing:
             "kd": round(self.data['total_kills'] / self.data['total_deaths'], 2),
             "avg_cs": round(self.data['total_contribution_score'] / self.data['total_matches_played']),
             "avg_plant_defuse": round(self.data['total_rounds_played'] /
-                                (self.data['total_planted_bombs'] + self.data['total_defused_bombs'])),
+                                      (self.data['total_planted_bombs'] + self.data['total_defused_bombs'])),
             "avg_give_weapon": round(self.data['total_rounds_played'] / self.data['total_weapons_donated']),
             "avg_mvp": round(self.data['total_wins'] / self.data['total_mvps'])
         }

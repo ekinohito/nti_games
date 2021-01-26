@@ -1,12 +1,14 @@
 import copy
 import json
 import requests
-from dota import helper
+# from dota import helper
 from analytics.overwatch.error import OverwatchError
+from core.models import OverwatchResult
 
 
 class Overwatch:
-    def __init__(self, nickname):
+    def __init__(self, nickname, db_entry: OverwatchResult):
+        self.db = db_entry
         self.nickname = nickname
         self.url = 'https://public-api.tracker.gg/v2/overwatch/standard/profile/battlenet/'
         self.main_stats = {
@@ -27,8 +29,8 @@ class Overwatch:
 
         with open('avg_over_responce2.json', 'r') as r:
             self.avg_responce = json.loads(r.read())
-        self.role_coefs = helper.over_role_coefs
-        self.hero_roles = helper.over_hero_roles
+        # self.role_coefs = helper.over_role_coefs
+        # self.hero_roles = helper.over_hero_roles
 
     def get_pro_stats(self):
         with open('1.txt', 'r') as r:
@@ -101,7 +103,6 @@ class Overwatch:
             for key in avg[role]:
                 if 'count' in avg[role] and avg[role]['count'] > 0:
                     avg[role][key] /= avg[role]['count']
-
 
         with open("avg_over_responce2.json", "w") as write_file:
             json.dump(avg, write_file)
@@ -203,7 +204,6 @@ class Overwatch:
 
             processed_data[role]['score'] = summ
         return processed_data
-
 
 # import pprint
 #

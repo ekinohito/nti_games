@@ -22,8 +22,10 @@ urlpatterns = [
 
     path('api/analyse/dota/start/', api.DotaAnalyseStart.as_view(), name='analyse-dota'),
     path('api/analyse/cs/start/', api.CsAnalyseStart.as_view(), name='analyse-cs'),
+    path('api/analyse/overwatch/start/', api.OverwatchAnalyseStart.as_view(), name='analyse-overwatch'),
     path('api/analyse/dota/result/', api.CurrentUserDotaResultView.as_view(), name='analyse_dota_result'),
     path('api/analyse/cs/result/', api.CurrentUserCsResultView.as_view(), name='analyse_cs_result'),
+    path('api/analyse/overwatch/result/', api.CurrentUserOverwatchResultView.as_view(), name='analyse_overwatch_result'),
     path('api/analyse/status/', api.TaskStatus.as_view(), name='task_status'),
 
     path('api/user/', api.CurrentUserView.as_view(), ),
