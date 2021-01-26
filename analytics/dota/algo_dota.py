@@ -1,3 +1,5 @@
+import json
+
 import requests
 from time import sleep
 from analytics.dota.counter import Counter
@@ -10,9 +12,10 @@ TEMPLATE = "Вы играете на {} роли \n" \
            "Вы стараетесь в играх на {} от возможных 100% \n" \
            "Процент участия в командных убийствах равен {}"
 
+
 class DotaAnalysing:
-    def __init__(self, steam_id):
-        self.db = DotaResult()
+    def __init__(self, steam_id, db_entry: DotaResult):
+        self.db = db_entry
         self.index = 0
         self.side = ""
         self.party = 0
@@ -30,10 +33,9 @@ class DotaAnalysing:
         self.db.result_num = info["score"]
         self.db.result_str = info["text_score"]
         self.db.result_big_str = TEMPLATE.format(info["role"], info["comparing_skill"],
-                                            info["benefit"], info["freequence_fight"])
-        self.db.result_json = info
+                                                 info["benefit"], info["frequency_fight"])
+        self.db.result_json = json.dumps(info)
         self.db.save()
-
 
     def analysis(self):
         party = Counter()
@@ -85,7 +87,7 @@ class DotaAnalysing:
                                   solo.check_is_empty(), party.check_is_empty())
 
     def get_final_res(self, a, b, c, d, e, f, solo_empty, party_empty):
-        print(a,b,c,d,e,f)
+        print(a, b, c, d, e, f)
         if solo_empty:
             score = round((0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) / 0.75, 2)
             return {"score": score,
@@ -104,7 +106,7 @@ class DotaAnalysing:
                     "frequency_fight": round(f, 2)}
 
         score = round((0.55 * (0.4 * a + 0.225 * (b[0] + b[1]) + 0.15 * c) + 0.45 * 0.9 * (
-                    0.4 * d + 0.225 * (e[0] + e[1]) + 0.15 * f) / 0.75), 2)
+                0.4 * d + 0.225 * (e[0] + e[1]) + 0.15 * f) / 0.75), 2)
         return {"score": score,
                 "text_score": self.get_text_score(score),
                 "role": "Core" if round((a + d), 2) <= 60 else "Support",
