@@ -66,7 +66,7 @@ class DotaAnalyseStart(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        ctx = {'error': None}
+        ctx = {'error': None, 'task_id': None}
         user = request.user
 
         if user.talantuser.steam_id is None:
