@@ -1,7 +1,7 @@
 openapi: 3.0.2
 info:
   title: 'NTI-Games API'
-  version: '1.0.4'
+  version: '1.1.0'
 paths:
   /api/auth/login/talent/:
     get:
@@ -218,35 +218,87 @@ components:
       properties:
         pk:
           type: integer
+          description: 'Id'
         steam_id:
           type: integer
           nullable: true
+          example: '12345678'
         blizzard_id:
           type: integer
           nullable: true
+          example: 12345678
         blizzard_battletag:
           type: string
           nullable: true
+          example: 'Ilon#1234'
         dota_result:
           allOf:
           - $ref: '#/components/schemas/DotaResult'
-          - nullable: true
         cs_result:
           allOf:
           - $ref: '#/components/schemas/CsResult'
-          - nullable: true
         dota_task:
           type: string
           nullable: true
+          description: 'Идентификатор задачи анализа Dota'
         cs_task:
           type: string
           nullable: true
+          description: 'Идентификатор задачи анализа Cs'
     DotaResult:
       type: object
-      description: 'Work in progress'
+      description: 'Результат анализа Dota'
+      properties:
+        error:
+          type: string
+          nullable: true
+          description: 'Сообщение об ошибке во время выполнения анализа. Если ошибки нет, а result=false - анализ ни разу не запускался'
+        result:
+          type: boolean
+          description: 'Получилось ли проанализировать, true - результат есть, false - ошибка'
+        result_num:
+          type: integer
+          nullable: true
+          description: 'Оценка командности игрока в виде числа в диапазоне от 0 до 100'
+        result_str:
+          type: string
+          nullable: true
+          description: 'Комментарий к оценке'
+        result_big_str:
+          type: string
+          nullable: true
+          description: 'Дополнительная информация по игроку'
+        result_json:
+          type: string
+          nullable: true
+          description: 'Полный результат анализа'
     CsResult:
       type: object
-      description: 'Work in progress'
+      description: 'Результат анализа Cs'
+      properties:
+        error:
+          type: string
+          nullable: true
+          description: 'Сообщение об ошибке во время выполнения анализа. Если ошибки нет, а result=false - анализ ни разу не запускался'
+        result:
+          type: boolean
+          description: 'Получилось ли проанализировать, true - результат есть, false - ошибка'
+        result_num:
+          type: integer
+          nullable: true
+          description: 'Оценка командности игрока в виде числа в диапазоне от 0 до 100'
+        result_str:
+          type: string
+          nullable: true
+          description: 'Комментарий к оценке'
+        result_big_str:
+          type: string
+          nullable: true
+          description: 'Дополнительная информация по игроку'
+        result_json:
+          type: string
+          nullable: true
+          description: 'Полный результат анализа'
     Task:
       type: object
       description: 'Состояние задачи'
@@ -264,9 +316,11 @@ components:
         error:
           type: string
           nullable: true
+          description: 'Сообщение об ошибке'
         task_id:
           type: string
           nullable: true
+          description: 'Идентификатор задачи'
   securitySchemes:
     cookieAuth:
       type: apiKey
