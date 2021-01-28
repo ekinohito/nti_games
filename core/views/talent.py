@@ -9,7 +9,7 @@ import time
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 
-from ..models import TalantUser, CsResult, DotaResult
+from ..models import TalantUser, CsResult, DotaResult, OverwatchResult
 from core.views.utils import generate_uri
 from dataclasses import dataclass
 
@@ -41,12 +41,15 @@ def register_user(talent_info: TalentInfo, token):
                 last_name=talent_info.last_name)
     cs_result = CsResult()
     dota_result = DotaResult()
+    overwatch_result = OverwatchResult()
 
     user.save()
     cs_result.save()
     dota_result.save()
+    overwatch_result.save()
 
-    talent_user = TalantUser(user=user, access_token=json.dumps(token), cs_result=cs_result, dota_result=dota_result)
+    talent_user = TalantUser(user=user, access_token=json.dumps(token),
+                             cs_result=cs_result, dota_result=dota_result, overwatch_result=overwatch_result)
     talent_user.save()
 
 

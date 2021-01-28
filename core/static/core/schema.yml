@@ -1,15 +1,15 @@
 openapi: 3.0.2
 info:
   title: 'NTI-Games API'
-  version: '1.0.3'
+  version: '1.0.4'
 paths:
   /api/auth/login/talent/:
     get:
       operationId: login_talent
       description: 'Авторизация через talent.kruzhok.org'
       responses:
-        '200':
-          description: No response body
+        '302':
+          description: 'No response body'
       security:
       - cookieAuth: []
       tags:
@@ -20,7 +20,7 @@ paths:
       description: 'Выход из учетной записи'
       responses:
         '200':
-          description: No response body
+          description: 'No response body'
       security:
       - cookieAuth: []
       tags:
@@ -30,8 +30,8 @@ paths:
       operationId: login_steam
       description: 'Привязка Steam к учетной записи'
       responses:
-        '200':
-          description: No response body
+        '302':
+          description: 'No response body'
       security:
       - cookieAuth: []
       tags:
@@ -42,7 +42,7 @@ paths:
       description: 'Отвязка Steam от учетной записи'
       responses:
         '200':
-          description: No response body
+          description: 'No response body'
       security:
       - cookieAuth: []
       tags:
@@ -52,8 +52,8 @@ paths:
       operationId: login_blizzard
       description: 'Привязка Blizzard к учетной записи'
       responses:
-        '200':
-          description: No response body
+        '302':
+          description: 'No response body'
       security:
       - cookieAuth: []
       tags:
@@ -64,7 +64,7 @@ paths:
       description: 'Отвязка Blizzard от учетной записи'
       responses:
         '200':
-          description: No response body
+          description: 'No response body'
       security:
       - cookieAuth: []
       tags:
@@ -102,15 +102,19 @@ paths:
   /api/analyse/status/:
     get:
       operationId: task_status
-      description: ''
-      parameters: []
+      description: 'Состояние задачи добавленной в очередь'
+      parameters:
+      - in: query
+        name: task
+        schema:
+          type: string
+        required: true
       responses:
         '200':
           content:
             application/json:
               schema:
-                type: array
-                items: {}
+                $ref: '#/components/schemas/Task'
           description: ''
       security:
       - cookieAuth: []
@@ -149,7 +153,7 @@ paths:
   /api/analyse/dota/start/:
     post:
       operationId: dota_start
-      description: ''
+      description: 'Добавить в очередь задачу для анализа профиля Dota'
       parameters: []
       requestBody:
         content:
@@ -163,7 +167,8 @@ paths:
         '201':
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/TaskStart'
           description: ''
       security:
       - cookieAuth: []
@@ -172,7 +177,7 @@ paths:
   /api/analyse/cs/start/:
     post:
       operationId: cs_start
-      description: ''
+      description: 'Добавить в очередь задачу для анализа профиля Cs'
       parameters: []
       requestBody:
         content:
@@ -186,7 +191,8 @@ paths:
         '201':
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/TaskStart'
           description: ''
       security:
       - cookieAuth: []
@@ -196,7 +202,7 @@ components:
   schemas:
     User:
       type: object
-      description: Данные пользователя
+      description: 'Данные пользователя'
       properties:
         id:
           type: integer
@@ -208,7 +214,7 @@ components:
           type: string
     UserGames:
       type: object
-      description: Дополнительная информация пользователя
+      description: 'Дополнительная информация пользователя'
       properties:
         pk:
           type: integer
@@ -236,11 +242,31 @@ components:
           type: string
           nullable: true
     DotaResult:
-      description: Work in progress
       type: object
+      description: 'Work in progress'
     CsResult:
-      description: Work in progress
       type: object
+      description: 'Work in progress'
+    Task:
+      type: object
+      description: 'Состояние задачи'
+      properties:
+        status:
+          type: string
+          enum:
+          - 'PENDING'
+          - 'SUCCESS'
+          - 'FAILURE'
+    TaskStart:
+      type: object
+      description: 'Информация о задаче добавленной в очередь'
+      properties:
+        error:
+          type: string
+          nullable: true
+        task_id:
+          type: string
+          nullable: true
   securitySchemes:
     cookieAuth:
       type: apiKey
