@@ -2,6 +2,7 @@ version: '3.7'
 
 services:
   web:
+    restart: always
     build: .
     command: gunicorn nti_games.wsgi:application --bind 0.0.0.0:8800 -w 2
     expose:
@@ -15,12 +16,14 @@ services:
       - redis
   
   celery:
+    restart: always
     build: .
     command: "celery -A nti_games worker -l info"
     depends_on:
       - web
 
   db:
+    restart: always
     image: postgres:12.0-alpine
     volumes:
       - postgres_data:/var/lib/postgresql/data/
@@ -28,10 +31,12 @@ services:
       - ./.env
 
   redis:
+    restart: always
     image: redis:alpine
     hostname: redis
 
   nginx:
+    restart: always
     build: ./nginx
     volumes:
       - static_volume:/home/app/web/staticfiles
