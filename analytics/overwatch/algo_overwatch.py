@@ -5,6 +5,12 @@ from analytics.overwatch import helper
 from analytics.overwatch.error import OverwatchError
 from core.models import OverwatchResult
 
+TEMPLATE = "Ваши ТОП-3 персонажи:  \n" \
+           "Ваш средний урон за 10 минут - {}   \n" \
+           "Ваш уровень игры на роли DAMAGE: {} \n" \
+           "Ваш уровень игры на роли SUPPORT: {} \n" \
+           "Ваш уровень игры на роли TANK: {} \n" \
+
 
 class Overwatch:
     def __init__(self, nickname, db_entry: OverwatchResult):
@@ -114,24 +120,24 @@ class Overwatch:
         parsed = self.parse_data(data)
         processed = self.process_data(copy.deepcopy(parsed))
         if data['gamesWon'] == 0:
+            self.db.result = False
+            self.db.error = "Вы не играете в эту игру"
+            self.db.save()
             raise OverwatchError("Вы не играете в эту игру")
         for role in parsed:
             if 'score' in processed[role]:
                 parsed[role]['score'] = processed[role]['score']
                 val = parsed[role]['score']
-                rate = 'good'
-                if 475 < val < 525:
-                    rate = 'good'
-                elif 400 < val < 476:
-                    rate = 'ok'
+                rate = ''
+                if 400 < val < 525:
+                    rate = ['хорошая', "хороший"]
                 elif 300 < val < 400:
-                    rate = 'poor'
+                    rate = ['средняя', "средний"]
                 elif val < 300:
-                    rate = 'bad'
+                    rate = ['плохая', "плохой"]
                 elif 525 < val < 580:
-                    rate = 'very good'
-                elif val > 580:
-                    rate = 'excelent'
+                    rate = ['отличная', "отличный"]
+
                 parsed[role]['rating'] = rate
 
         parsed['roles'] = []
@@ -139,7 +145,20 @@ class Overwatch:
             parsed['roles'].append({'role': role, 'score': parsed[role]['score'], 'rating': parsed[role]['rating']})
             parsed.pop(role)
         return_dict = {'player': parsed, 'avg': copy.deepcopy(self.avg_responce).pop('normal')}
-        return return_dict
+
+        info = return_dict
+
+        self.db.result = True
+        self.db.result_num = round(info["player"]["normal"]["score"], 2)
+        heroes = [x[0] for x in sorted(list(info["player"]["heroTimes"].items()), key=lambda i: i[1], reverse=True)[:3]]
+        self.db.result_big_str = TEMPLATE.format(", ".join(heroes),
+                                                 info["player"]["normal"]["allDamageDoneAvgPer10Min"],
+                                                 info["player"]["roles"][0]["rating"][1],
+                                                 info["player"]["roles"][1]["rating"][1],
+                                                 info["player"]["roles"][2]["rating"][1])
+        self.db.result_str = f"В игре Overwatch у вас {info['player']['normal']['rating'][0]} командная работа"
+        self.db.result_json = json.dumps(info)
+        self.db.save()
 
     def parse_data(self, data):
         parsed_data = {'normal': self.main_stats.copy(), 'damage': self.main_stats.copy(),
@@ -204,9 +223,3 @@ class Overwatch:
 
             processed_data[role]['score'] = summ
         return processed_data
-
-# import pprint
-#
-# ov = Overwatch("Easternsun-11584")
-# a = Overwatch("Hawk-13948")
-# pprint.pprint(ov.get_stats())
