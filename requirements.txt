@@ -8,4 +8,4 @@ python-dotenv
 requests
 djangorestframework
 pyyaml
-cryptography==3.2.1
+cryptography==3.3.2
