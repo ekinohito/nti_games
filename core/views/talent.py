@@ -32,7 +32,7 @@ class TalentInfo:
 def get_talent_info(token) -> TalentInfo:
     client = OAuth2Session(client_id, client_secret, token=token)
     # id, email, first_name, last_name
-    resp = client.get('https://talent.kruzhok.org/api/user/').json()
+    resp = client.get('https://talent.kruzhok.org/api/users/me').json()
     return TalentInfo(id=resp['id'], email=resp['email'], first_name=resp['first_name'], last_name=resp['last_name'])
 
 
