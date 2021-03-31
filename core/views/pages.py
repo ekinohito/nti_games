@@ -17,10 +17,10 @@ def user_page(request):
 def analyse_page(request):
     return render(request, 'core/analyse.html', {
         'user': request.user,
-        'dota_result': None if (request.user.talantuser.dota_result.result is None
+        'dota_result': None if (request.user.talantuser.dota_result.result is None or request.user.talantuser.dota_result.result_json is None
                                 or request.user.talantuser.dota_result.error) else
-        json.loads(request.user.talantuser.dota_result.result),
-        'cs_result': None if (request.user.talantuser.cs_result.result is None
+        json.loads(request.user.talantuser.dota_result.result_json),
+        'cs_result': None if (request.user.talantuser.cs_result.result is None or request.user.talantuser.cs_result.result_json is None
                               or request.user.talantuser.cs_result.error) else
-        json.loads(request.user.talantuser.cs_result.result),
+        json.loads(request.user.talantuser.cs_result.result_json),
     })
