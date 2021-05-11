@@ -89,7 +89,7 @@ class AuthCompleteTalent(APIView):
 
         if user is not None:
             login(request, user)
-            return redirect('user_page')
+            return redirect('http://localhost:3000/app')
 
         return redirect('index')
 
