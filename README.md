@@ -4,11 +4,11 @@
 ```bash
 git clone https://github.com/Platun0v/nti_games
 ```
-Добавте в файл `.env.example` свои значения и сохраните, как `.env`
+Файл `.env` уже подготовлен и добавлен
 
 ```bash
 docker-compose build
 docker-compose up -d
 ```
 
-После этого Docker слушает 1337 порт
+После этого Docker слушает 80 порт
