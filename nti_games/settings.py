@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
 import os
+from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -40,6 +41,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    # 'core.middleware.simple_middleware.simple_middleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -183,4 +185,6 @@ AUTHLIB_OAUTH_CLIENTS = {
 }
 BLIZZARD_CONF_URL = 'https://eu.battle.net/oauth/.well-known/openid-configuration'
 BLIZZARD_API_USERINFO_URL = 'https://eu.battle.net/oauth/userinfo'
+
+FRONTEND = os.environ.get("FRONTEND")
 

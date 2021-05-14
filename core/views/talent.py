@@ -16,9 +16,20 @@ from dataclasses import dataclass
 from django.conf import settings
 from authlib.integrations.requests_client import OAuth2Session
 
+from django.contrib.auth.signals import user_logged_in
+
 client_id = settings.TALENT_CLIENT_ID
 client_secret = settings.TALENT_CLIENT_SECRET
 token_endpoint = settings.TALENT_TOKEN_ENDPOINT
+
+
+def user_logged_in_handler(sender, request, user, **kwargs):
+    # UserSession.objects.get_or_create(user=user, session_id=request.session.session_key)
+    request.cringe = request.session.session_key
+
+
+user_logged_in.connect(user_logged_in_handler)
+
 
 
 @dataclass
@@ -89,7 +100,12 @@ class AuthCompleteTalent(APIView):
 
         if user is not None:
             login(request, user)
-            return redirect('http://localhost:3000/app')
+            # sessionid = UserSession.objects.filter(user=user)
+            csrftoken = request.COOKIES.get('csrftoken')
+            response = redirect(settings.FRONTEND + f"/app")
+            response.set_cookie('sessionidu', request.cringe)
+            print(request.cringe)
+            return response
 
         return redirect('index')
 
