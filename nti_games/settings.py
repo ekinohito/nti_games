@@ -41,7 +41,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
-    # 'core.middleware.simple_middleware.simple_middleware',
+    'core.middleware.simple_middleware.simple_middleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -188,3 +188,7 @@ BLIZZARD_API_USERINFO_URL = 'https://eu.battle.net/oauth/userinfo'
 
 FRONTEND = os.environ.get("FRONTEND")
 
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SAMESITE = 'None'
+SESSION_COOKIE_SAMESITE = 'None'

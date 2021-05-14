@@ -103,8 +103,7 @@ class AuthCompleteTalent(APIView):
             # sessionid = UserSession.objects.filter(user=user)
             csrftoken = request.COOKIES.get('csrftoken')
             response = redirect(settings.FRONTEND + f"/app")
-            response.set_cookie('sessionidu', request.cringe)
-            print(request.cringe)
+            # response.set request.cringe
             return response
 
         return redirect('index')
